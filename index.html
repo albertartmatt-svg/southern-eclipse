@@ -1637,7 +1637,7 @@
   <!-- =====================================================================
        MOXFIELD POP-UP VIEWER MODAL (Selectable AP Catalog OR Visual Gallery)
        ===================================================================== -->
-  <div id="moxfield-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true">
+  <div id="moxfield-popup-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true">
     <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 bg-[#FAFBFD] border-b border-[#DCE2E8] flex flex-wrap items-center justify-between gap-3">
@@ -1666,12 +1666,12 @@
 
       <!-- Search & Foil Filter Bar -->
       <div class="px-5 py-3 bg-[#F1F4F7] border-b border-[#DCE2E8] flex flex-wrap items-center justify-between gap-3">
-        <input type="text" id="mx-search-input" oninput="renderMoxfieldCards()" placeholder="Search card name..."
+        <input type="text" id="mx-search-input" oninput="renderMoxfieldCards()" placeholder="Search card name or set code..."
           class="flex-1 min-w-[200px] px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
 
         <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-white px-3 py-2 rounded-xl border border-[#DCE2E8]">
           <input type="checkbox" id="mx-foil-only" onchange="renderMoxfieldCards()" class="rounded text-[#1B5E48] focus:ring-0" />
-          <span class="font-mono text-xs font-medium text-[#11161C]">Foil Only (*F*)</span>
+          <span class="font-mono text-xs font-medium text-[#11161C]">Foil / Etched Only (*F*)</span>
         </label>
       </div>
 
@@ -1686,7 +1686,7 @@
        VISUAL EDITOR: MOXFIELD POP-UP CONFIGURATOR MODAL
        ===================================================================== -->
   <div id="moxfield-editor-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-start justify-between gap-4">
         <div>
           <span class="font-mono text-xs text-[#2E5A78]">MOXFIELD POP-UP INTEGRATION</span>
@@ -1723,27 +1723,41 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label for="mx-ed-label" class="block font-mono text-xs text-[#4A5564] mb-1">Button Label</label>
-          <input type="text" id="mx-ed-label" placeholder="Browse AP List (Pop-up)"
-            class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+      <div>
+        <label for="mx-ed-label" class="block font-mono text-xs text-[#4A5564] mb-1">Button Label</label>
+        <input type="text" id="mx-ed-label" placeholder="Browse AP List (Pop-up)"
+          class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+      </div>
+
+      <!-- Moxfield Deck URL + Direct Sync Button -->
+      <div class="space-y-1.5">
+        <label for="mx-ed-url" class="block font-mono text-xs text-[#4A5564]">Moxfield Deck URL</label>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input type="url" id="mx-ed-url" placeholder="https://moxfield.com/decks/S0mnQeoWsUqbNYQtzctlXg"
+            class="flex-1 px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+          <button type="button" id="btn-sync-moxfield" onclick="syncFromMoxfieldUrl()"
+            class="px-3.5 py-2 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-semibold whitespace-nowrap transition shadow-2xs flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>Sync from Moxfield URL</span>
+          </button>
         </div>
-        <div>
-          <label for="mx-ed-url" class="block font-mono text-xs text-[#4A5564] mb-1">Moxfield Deck URL (Optional)</label>
-          <input type="url" id="mx-ed-url" placeholder="https://moxfield.com/decks/..."
-            class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
-        </div>
+        <div id="mx-ed-sync-status" class="hidden"></div>
       </div>
 
       <div>
-        <label for="mx-ed-decktext" class="block font-mono text-xs text-[#4A5564] mb-1">
-          Moxfield Decklist Export (Paste from Moxfield → More → Export → Copy for Moxfield)
-        </label>
-        <textarea id="mx-ed-decktext" rows="6" placeholder="1 Bone Miser (C19) 15&#10;1 Syr Konrad, the Grim (ELD) 107 *F*&#10;1 Blood Artist"
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <label for="mx-ed-decktext" class="block font-mono text-xs text-[#4A5564]">
+            Full Decklist (Exact Set &amp; Collector Numbers)
+          </label>
+          <span id="mx-ed-parsed-count" class="font-mono text-[11px] font-medium text-[#1B5E48]">0 cards detected</span>
+        </div>
+        <textarea id="mx-ed-decktext" rows="7" oninput="updateMoxfieldEditorPreviewCount()"
+          placeholder="1 Command Tower (PW25) 17 *F*&#10;1 Bonecaller Cleric (J25) 112&#10;1 Koma, World-Eater (KHM) 221"
           class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]"></textarea>
-        <p class="font-mono text-[11px] text-[#4A5564] mt-1">
-          Supports set codes, collector numbers, and <code class="bg-[#F1F4F7] px-1 rounded">*F*</code> foil tags. Card images load automatically via Scryfall.
+        <p class="font-mono text-[11px] text-[#4A5564] mt-1 leading-relaxed">
+          Tip: Pasting directly from Moxfield (<code class="bg-[#F1F4F7] px-1 rounded">More → Export → Copy for Moxfield</code>) also works offline/anytime for 100% of cards with exact <code class="bg-[#F1F4F7] px-1 rounded">(SET) #</code> printings and <code class="bg-[#F1F4F7] px-1 rounded">*F*</code> / <code class="bg-[#F1F4F7] px-1 rounded">*E*</code> tags.
         </p>
       </div>
 
@@ -1754,6 +1768,29 @@
         <button type="button" onclick="saveMoxfieldEditor()" class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-semibold">
           Save Pop-up Settings
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VISUAL EDITOR: PER-CARD SCRYFALL EDITION / PRINTING PICKER MODAL
+       ===================================================================== -->
+  <div id="edition-picker-modal" class="fixed inset-0 z-[60] hidden bg-[#11161C]/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-[#FAFBFD] border-b border-[#DCE2E8] flex items-center justify-between gap-4">
+        <div>
+          <span class="font-mono text-xs text-[#2E5A78]">SCRYFALL PRINTING SWITCHER</span>
+          <h3 id="ed-picker-title" class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C] mt-0.5">
+            Select Exact Card Printing
+          </h3>
+        </div>
+        <button type="button" onclick="closeEditionPicker()" class="p-2 rounded-xl hover:bg-[#F1F4F7] text-[#4A5564]" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div id="ed-picker-grid" class="flex-1 overflow-y-auto p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Populated dynamically with all Scryfall printings -->
       </div>
     </div>
   </div>
@@ -1811,9 +1848,10 @@
     let stagedUploadsInModal = {}; // { [slideIdx]: { path, base64, previewUrl } }
 
     // Moxfield Pop-up Viewer & Editor State
-    let activeMoxfieldView = null; // { artistName, cardTitle, config, parsedCards }
+    let activeMoxfieldView = null; // { artistIdx, collection, itemIdx, artistName, cardTitle, config, parsedCards }
     let activeMoxfieldTarget = null; // { artistIdx, collection, itemIdx }
-    const scryfallCache = {}; // { [cacheKey]: { imageUrl, artist, setName } }
+    let activeEditionTarget = null; // { lineIndex, cardName, currentSet, currentCn }
+    const scryfallCache = {}; // { [cacheKey]: { imageUrl, set, collectorNumber } }
 
     // Drag-and-Drop Reordering State
     let dragState = null; // { type: 'artist'|'section'|'item', artistIdx, sectionKey, collection, itemIdx }
@@ -2753,6 +2791,10 @@
         if (e.key === 'ArrowLeft') navigateLightbox(-1);
         if (e.key === 'ArrowRight') navigateLightbox(1);
       } else if (e.key === 'Escape') {
+        if (!document.getElementById('edition-picker-modal').classList.contains('hidden')) {
+          closeEditionPicker();
+          return;
+        }
         closeInquiryModal();
         closeImageEditorModal();
         closeGhTokenModal();
@@ -2762,17 +2804,627 @@
     });
 
     // -----------------------------------------------------------------------
-    // Web3Forms Inquiry Modal Logic
+    // Moxfield Pop-up Viewer, Full Deck Sync & Per-Card Edition Switcher
     // -----------------------------------------------------------------------
-    function openInquiryModal({ artistName, pieceTitle }) {
+    function parseMoxfieldDecklist(deckText) {
+      const lines = String(deckText || '').split(/\r?\n/);
+      const parsed = [];
+
+      lines.forEach((rawLine, lineIndex) => {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('//') || line.startsWith('#') || /^(deck|sideboard|commander|companion|maybeboard|considerations|tokens):?$/i.test(line)) {
+          return;
+        }
+
+        const isEtched = /\*e\*/i.test(line);
+        const isFoil = /\*f\*/i.test(line);
+        let clean = line.replace(/\*f\*/gi, '').replace(/\*e\*/gi, '').trim();
+
+        let qty = 1;
+        const qtyMatch = clean.match(/^(\d+)x?\s+/i);
+        if (qtyMatch) {
+          qty = parseInt(qtyMatch[1], 10) || 1;
+          clean = clean.slice(qtyMatch[0].length).trim();
+        }
+
+        let setCode = '';
+        let collectorNum = '';
+        // Supports all Scryfall collector number formats: digits (17), letters (123a), hyphens (KHM-221), stars (288★), etc.
+        const setMatch = clean.match(/\(([a-z0-9]{2,8})\)(?:\s+([^\s()]+))?\s*$/i);
+        if (setMatch) {
+          setCode = setMatch[1].toLowerCase();
+          collectorNum = setMatch[2] || '';
+          clean = clean.slice(0, setMatch.index).trim();
+        }
+
+        if (clean) {
+          parsed.push({
+            lineIndex,
+            qty,
+            name: clean,
+            set: setCode,
+            collectorNumber: collectorNum,
+            foil: isFoil,
+            etched: isEtched
+          });
+        }
+      });
+
+      return parsed;
+    }
+
+    function getCardCacheKey(card) {
+      return `${(card.name || '').toLowerCase()}|${(card.set || '').toLowerCase()}|${(card.collectorNumber || '').toLowerCase()}`;
+    }
+
+    function getScryfallFallbackUrl(card) {
+      if (card.set && card.collectorNumber) {
+        return `https://api.scryfall.com/cards/${encodeURIComponent(card.set.toLowerCase())}/${encodeURIComponent(card.collectorNumber)}?format=image&version=normal`;
+      }
+      if (card.set) {
+        return `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.name)}&set=${encodeURIComponent(card.set.toLowerCase())}&format=image&version=normal`;
+      }
+      return `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.name)}&format=image&version=normal`;
+    }
+
+    function extractScryfallImage(cardObj) {
+      return (
+        cardObj.image_uris?.normal ||
+        cardObj.image_uris?.large ||
+        cardObj.card_faces?.[0]?.image_uris?.normal ||
+        cardObj.card_faces?.[0]?.image_uris?.large ||
+        ''
+      );
+    }
+
+    async function postScryfallCollectionBatch(identifiers) {
+      const res = await fetch('https://api.scryfall.com/cards/collection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifiers })
+      });
+      if (!res.ok) return [];
+      const payload = await res.json();
+      return payload.data || [];
+    }
+
+    // 3-Pass Exact Printing Resolution:
+    // Pass 1: Strict { set, collector_number }
+    // Pass 2: Fallback { name, set } for any card in not_found or without collector number
+    // Pass 3: Fallback { name } only if set is absent or not found
+    async function hydrateScryfallImages(cards) {
+      const uncached = cards.filter((c) => !scryfallCache[getCardCacheKey(c)]);
+      if (uncached.length === 0) return;
+
+      const pass1Candidates = uncached.filter((c) => c.set && c.collectorNumber);
+      const pass2Candidates = uncached.filter((c) => c.set && !c.collectorNumber);
+      const pass3Candidates = uncached.filter((c) => !c.set);
+
+      // Pass 1: Strict { set, collector_number } in chunks of 75
+      for (let i = 0; i < pass1Candidates.length; i += 75) {
+        const batch = pass1Candidates.slice(i, i + 75);
+        try {
+          const returned = await postScryfallCollectionBatch(
+            batch.map((c) => ({ set: c.set.toLowerCase(), collector_number: c.collectorNumber }))
+          );
+
+          batch.forEach((card) => {
+            const match = returned.find(
+              (r) =>
+                (r.set || '').toLowerCase() === card.set.toLowerCase() &&
+                (r.collector_number || '').toLowerCase() === card.collectorNumber.toLowerCase()
+            );
+            const imgUri = match ? extractScryfallImage(match) : '';
+            if (imgUri) {
+              scryfallCache[getCardCacheKey(card)] = {
+                imageUrl: imgUri,
+                set: (match.set || card.set).toLowerCase(),
+                collectorNumber: match.collector_number || card.collectorNumber
+              };
+            } else {
+              pass2Candidates.push(card);
+            }
+          });
+        } catch (_) {
+          pass2Candidates.push(...batch);
+        }
+      }
+
+      // Pass 2: { name, set } in chunks of 75
+      for (let i = 0; i < pass2Candidates.length; i += 75) {
+        const batch = pass2Candidates.slice(i, i + 75);
+        try {
+          const returned = await postScryfallCollectionBatch(
+            batch.map((c) => ({ name: c.name, set: c.set.toLowerCase() }))
+          );
+
+          batch.forEach((card) => {
+            const qName = card.name.toLowerCase();
+            const match = returned.find((r) => {
+              const rName = (r.name || '').toLowerCase();
+              const nameOk = rName === qName || rName.startsWith(qName + ' //');
+              return nameOk && (r.set || '').toLowerCase() === card.set.toLowerCase();
+            });
+            const imgUri = match ? extractScryfallImage(match) : '';
+            if (imgUri) {
+              scryfallCache[getCardCacheKey(card)] = {
+                imageUrl: imgUri,
+                set: (match.set || card.set).toLowerCase(),
+                collectorNumber: match.collector_number || card.collectorNumber
+              };
+            } else {
+              pass3Candidates.push(card);
+            }
+          });
+        } catch (_) {
+          pass3Candidates.push(...batch);
+        }
+      }
+
+      // Pass 3: { name } alone in chunks of 75
+      for (let i = 0; i < pass3Candidates.length; i += 75) {
+        const batch = pass3Candidates.slice(i, i + 75);
+        try {
+          const returned = await postScryfallCollectionBatch(
+            batch.map((c) => ({ name: c.name }))
+          );
+
+          batch.forEach((card) => {
+            const qName = card.name.toLowerCase();
+            const match = returned.find((r) => {
+              const rName = (r.name || '').toLowerCase();
+              return rName === qName || rName.startsWith(qName + ' //');
+            });
+            const imgUri = match ? extractScryfallImage(match) : '';
+            if (imgUri) {
+              scryfallCache[getCardCacheKey(card)] = {
+                imageUrl: imgUri,
+                set: (match.set || card.set || '').toLowerCase(),
+                collectorNumber: match.collector_number || card.collectorNumber || ''
+              };
+            }
+          });
+        } catch (_) {
+          // Fallback URL handles any remaining offline items
+        }
+      }
+    }
+
+    async function openMoxfieldModal(artistIdx, collection, itemIdx) {
+      const artist = siteData.artists[artistIdx];
+      const item = artist[collection][itemIdx];
+      const mx = getItemMoxfield(item) || {};
+      const parsedCards = parseMoxfieldDecklist(mx.deckList || '');
+
+      activeMoxfieldView = {
+        artistIdx,
+        collection,
+        itemIdx,
+        artistName: artist.name,
+        cardTitle: item.title,
+        config: mx,
+        parsedCards
+      };
+
+      const isGallery = mx.mode === 'gallery';
+      document.getElementById('mx-view-badge').textContent = isGallery ? 'MOXFIELD VISUAL GALLERY' : 'MOXFIELD AP CATALOG';
+      document.getElementById('mx-view-title').textContent = `${artist.name} — ${item.title}`;
+      document.getElementById('mx-search-input').value = '';
+      document.getElementById('mx-foil-only').checked = false;
+
+      const extLink = document.getElementById('mx-external-link');
+      if (mx.deckUrl) {
+        extLink.href = mx.deckUrl;
+        extLink.classList.remove('hidden');
+      } else {
+        extLink.classList.add('hidden');
+      }
+
+      document.getElementById('moxfield-popup-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      renderMoxfieldCards();
+      await hydrateScryfallImages(parsedCards);
+      if (activeMoxfieldView) renderMoxfieldCards();
+    }
+
+    function closeMoxfieldModal() {
+      document.getElementById('moxfield-popup-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      activeMoxfieldView = null;
+    }
+
+    function renderMoxfieldCards() {
+      if (!activeMoxfieldView) return;
+      const grid = document.getElementById('mx-cards-grid');
+      const query = document.getElementById('mx-search-input').value.trim().toLowerCase();
+      const foilOnly = document.getElementById('mx-foil-only').checked;
+      const isGallery = activeMoxfieldView.config.mode === 'gallery';
+
+      const filtered = activeMoxfieldView.parsedCards.filter((c) => {
+        if (foilOnly && !c.foil && !c.etched) return false;
+        if (query) {
+          const matchesName = c.name.toLowerCase().includes(query);
+          const matchesSet = c.set && c.set.toLowerCase().includes(query);
+          if (!matchesName && !matchesSet) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('mx-view-count').textContent = `${filtered.length} card${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-sm text-[#4A5564]">No cards match your filter.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((card) => {
+        const cached = scryfallCache[getCardCacheKey(card)];
+        const imgSrc = cached?.imageUrl || getScryfallFallbackUrl(card);
+        const displaySet = (card.set || cached?.set || '').toUpperCase();
+        const displayCn = card.collectorNumber || cached?.collectorNumber || '';
+        const editionBadge = displaySet
+          ? `${displaySet}${displayCn ? ' · #' + displayCn : ''}`
+          : 'STANDARD';
+        const finishLabel = card.etched ? 'Etched Foil AP' : card.foil ? 'Foil AP' : 'Non-Foil AP';
+        const selectionMeta = `${finishLabel}${displaySet ? ' · ' + displaySet + (displayCn ? ' #' + displayCn : '') : ''}`;
+
+        return `
+          <div class="bg-white border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between shadow-2xs">
+            <div class="relative aspect-[5/7] bg-[#E6ECF2]">
+              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(card.name)}" loading="lazy"
+                onerror="this.src='https://placehold.co/488x680/DCE2E8/4A5564?text=${encodeURIComponent(card.name)}'"
+                class="w-full h-full object-contain" />
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#11161C]/80 text-white font-mono text-[10px] font-medium backdrop-blur-xs">
+                ${escapeHtml(editionBadge)}
+              </span>
+              ${card.etched
+                ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-purple-300/95 text-[#11161C] font-mono text-[10px] font-bold shadow-xs">ETCHED</span>`
+                : card.foil
+                  ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-400/95 text-[#11161C] font-mono text-[10px] font-bold shadow-xs">FOIL</span>`
+                  : ''
+              }
+              ${isEditMode ? `
+                <button type="button" onclick="openEditionPicker(${card.lineIndex})"
+                  class="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-[#11161C]/90 hover:bg-[#2E5A78] text-white font-mono text-[11px] font-medium shadow-md transition">
+                  ↻ Edition
+                </button>
+              ` : ''}
+            </div>
+            <div class="p-3 flex flex-col gap-2">
+              <div>
+                <h4 class="font-semibold text-xs sm:text-sm text-[#11161C] leading-snug line-clamp-2">${escapeHtml(card.name)}</h4>
+                <p class="font-mono text-[11px] text-[#4A5564] mt-0.5">${escapeHtml(selectionMeta)}</p>
+              </div>
+              ${isGallery ? '' : `
+                <button type="button" onclick="selectMoxfieldCard('${escapeHtml(card.name).replace(/'/g, "\\'")}', '${escapeHtml(selectionMeta).replace(/'/g, "\\'")}')"
+                  class="w-full py-2 px-3 rounded-lg bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-medium transition">
+                  Select this AP
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectMoxfieldCard(cardName, finishInfo) {
+      if (!activeMoxfieldView) return;
+      const artistName = activeMoxfieldView.artistName;
+      closeMoxfieldModal();
+      openInquiryModal({
+        artistName,
+        pieceTitle: `AP Selection: ${cardName} (${finishInfo})`
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // Direct Sync from Moxfield URL (Commanders + Mainboard + Sideboard)
+    // -----------------------------------------------------------------------
+    function extractMoxfieldDeckId(url) {
+      const match = String(url || '').trim().match(/moxfield\.com\/decks\/([a-zA-Z0-9_-]+)/i);
+      return match ? match[1] : null;
+    }
+
+    function extractAllLinesFromMoxfieldPayload(data) {
+      const lines = [];
+      const seenBoards = [];
+
+      // Moxfield v3 structure: data.boards.{commanders, mainboard, sideboard, companions, ...}.cards
+      if (data && data.boards && typeof data.boards === 'object') {
+        const priorityKeys = ['commanders', 'companions', 'mainboard', 'sideboard', 'signatureSpells'];
+        const allKeys = [...new Set([...priorityKeys, ...Object.keys(data.boards)])];
+        allKeys.forEach((bKey) => {
+          if (bKey === 'maybeboard' || bKey === 'considerations') return;
+          const board = data.boards[bKey];
+          if (board && board.cards && typeof board.cards === 'object') {
+            seenBoards.push(board.cards);
+          }
+        });
+      }
+
+      // Fallback for flat v2 structures
+      if (seenBoards.length === 0 && data && typeof data === 'object') {
+        ['commanders', 'companions', 'mainboard', 'sideboard'].forEach((bKey) => {
+          if (data[bKey] && typeof data[bKey] === 'object') {
+            seenBoards.push(data[bKey]);
+          }
+        });
+      }
+
+      seenBoards.forEach((cardsMap) => {
+        Object.values(cardsMap).forEach((entry) => {
+          if (!entry) return;
+          const qty = entry.quantity || 1;
+          const cardObj = entry.card || entry;
+          const name = cardObj.name;
+          if (!name) return;
+
+          const setCode = (cardObj.set || '').toUpperCase();
+          const cn = cardObj.cn || cardObj.collector_number || '';
+          const finish = (entry.finish || '').toLowerCase();
+          const finishTag = finish === 'etched'
+            ? ' *E*'
+            : (finish === 'foil' || entry.isFoil)
+              ? ' *F*'
+              : '';
+          const setPart = setCode ? ` (${setCode})${cn ? ' ' + cn : ''}` : '';
+          lines.push(`${qty} ${name}${setPart}${finishTag}`);
+        });
+      });
+
+      return lines;
+    }
+
+    async function syncFromMoxfieldUrl() {
+      const urlInput = document.getElementById('mx-ed-url').value.trim();
+      const statusEl = document.getElementById('mx-ed-sync-status');
+      const syncBtn = document.getElementById('btn-sync-moxfield');
+      const deckId = extractMoxfieldDeckId(urlInput);
+
+      if (!deckId) {
+        statusEl.className = 'p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium';
+        statusEl.textContent = 'Invalid Moxfield URL. Use a link like https://moxfield.com/decks/S0mnQeoWsUqbNYQtzctlXg';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      syncBtn.disabled = true;
+      statusEl.className = 'p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium';
+      statusEl.textContent = 'Fetching full deck & exact printings from Moxfield...';
+      statusEl.classList.remove('hidden');
+
+      const targetApi = `https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(deckId)}`;
+      const endpoints = [
+        targetApi,
+        `https://corsproxy.io/?url=${encodeURIComponent(targetApi)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetApi)}`
+      ];
+
+      let deckJson = null;
+      for (const endpoint of endpoints) {
+        try {
+          const res = await fetch(endpoint, { headers: { 'Accept': 'application/json' } });
+          if (!res.ok) continue;
+          const candidate = await res.json();
+          if (candidate && (candidate.boards || candidate.mainboard || candidate.commanders)) {
+            deckJson = candidate;
+            break;
+          }
+        } catch (_) {
+          // Try next CORS fallback endpoint
+        }
+      }
+
+      syncBtn.disabled = false;
+
+      if (!deckJson) {
+        statusEl.className = 'p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs leading-relaxed';
+        statusEl.innerHTML = 'Moxfield blocked automated browser sync. Open your deck in Moxfield, click <strong>More → Export → Copy for Moxfield</strong>, and paste the full list below.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      const lines = extractAllLinesFromMoxfieldPayload(deckJson);
+      if (lines.length === 0) {
+        statusEl.className = 'p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium';
+        statusEl.textContent = 'Deck loaded, but no cards were found in commanders, mainboard, or sideboard.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('mx-ed-decktext').value = lines.join('\n');
+      updateMoxfieldEditorPreviewCount();
+
+      statusEl.className = 'p-2.5 rounded-xl bg-[#1B5E48]/12 border border-[#1B5E48]/30 text-[#1B5E48] text-xs font-medium';
+      statusEl.textContent = `Synced ${lines.length} exact printings from Moxfield! Click "Save Pop-up Settings" to apply.`;
+      statusEl.classList.remove('hidden');
+    }
+
+    function updateMoxfieldEditorPreviewCount() {
+      const text = document.getElementById('mx-ed-decktext').value;
+      const count = parseMoxfieldDecklist(text).length;
+      const badge = document.getElementById('mx-ed-parsed-count');
+      if (badge) {
+        badge.textContent = `${count} card${count === 1 ? '' : 's'} detected`;
+      }
+    }
+
+    function openMoxfieldEditor(artistIdx, collection, itemIdx) {
+      activeMoxfieldTarget = { artistIdx, collection, itemIdx };
+      const item = siteData.artists[artistIdx][collection][itemIdx];
+      const mx = getItemMoxfield(item) || {
+        enabled: true,
+        mode: 'catalog',
+        buttonLabel: 'Browse AP List (Pop-up)',
+        deckUrl: 'https://moxfield.com',
+        deckList: ''
+      };
+
+      document.getElementById('mx-ed-enabled').checked = Boolean(mx.enabled);
+      const modeRadios = document.querySelectorAll('input[name="mx-ed-mode"]');
+      modeRadios.forEach((r) => {
+        r.checked = r.value === (mx.mode === 'gallery' ? 'gallery' : 'catalog');
+      });
+      document.getElementById('mx-ed-label').value = mx.buttonLabel || 'Browse AP List (Pop-up)';
+      document.getElementById('mx-ed-url').value = mx.deckUrl || '';
+      document.getElementById('mx-ed-decktext').value = mx.deckList || '';
+      document.getElementById('mx-ed-sync-status').classList.add('hidden');
+      updateMoxfieldEditorPreviewCount();
+
+      document.getElementById('moxfield-editor-modal').classList.remove('hidden');
+    }
+
+    function closeMoxfieldEditor() {
+      document.getElementById('moxfield-editor-modal').classList.add('hidden');
+      activeMoxfieldTarget = null;
+    }
+
+    function saveMoxfieldEditor() {
+      if (!activeMoxfieldTarget) return;
+      const { artistIdx, collection, itemIdx } = activeMoxfieldTarget;
+      const selectedMode = document.querySelector('input[name="mx-ed-mode"]:checked')?.value || 'catalog';
+      const targetItem = siteData.artists[artistIdx][collection][itemIdx];
+
+      delete targetItem.moxfieldPopup;
+      targetItem.moxfield = {
+        enabled: document.getElementById('mx-ed-enabled').checked,
+        mode: selectedMode,
+        buttonLabel: document.getElementById('mx-ed-label').value.trim() || (selectedMode === 'gallery' ? 'View Card Gallery (Pop-up)' : 'Browse AP List (Pop-up)'),
+        deckUrl: document.getElementById('mx-ed-url').value.trim(),
+        deckList: document.getElementById('mx-ed-decktext').value
+      };
+
+      markDirty();
+      closeMoxfieldEditor();
+      renderArtists();
+      showToast('Moxfield Pop-up saved (click Publish Changes to update live site)');
+    }
+
+    // -----------------------------------------------------------------------
+    // Per-Card Scryfall Edition / Printing Picker (in Visual Edit Mode)
+    // -----------------------------------------------------------------------
+    async function openEditionPicker(lineIndex) {
+      if (!activeMoxfieldView) return;
+      const card = activeMoxfieldView.parsedCards.find((c) => c.lineIndex === lineIndex);
+      if (!card) return;
+
+      activeEditionTarget = {
+        lineIndex,
+        cardName: card.name,
+        currentSet: (card.set || '').toLowerCase(),
+        currentCn: (card.collectorNumber || '').toLowerCase()
+      };
+
+      const modal = document.getElementById('edition-picker-modal');
+      const grid = document.getElementById('ed-picker-grid');
+      document.getElementById('ed-picker-title').textContent = `Printings for "${card.name}"`;
+      grid.innerHTML = `<div class="col-span-full py-12 text-center font-mono text-xs text-[#4A5564]">Loading all Scryfall printings for ${escapeHtml(card.name)}...</div>`;
+      modal.classList.remove('hidden');
+
+      try {
+        const query = encodeURIComponent(`!"${card.name}"`);
+        let res = await fetch(`https://api.scryfall.com/cards/search?q=${query}&unique=prints&order=released&dir=desc`);
+        if (!res.ok) {
+          // Fallback if front-face name of a double-faced card was entered
+          const fallbackQ = encodeURIComponent(`"${card.name}"`);
+          res = await fetch(`https://api.scryfall.com/cards/search?q=${fallbackQ}&unique=prints&order=released&dir=desc`);
+        }
+        if (!res.ok) throw new Error('No printings found on Scryfall');
+
+        const payload = await res.json();
+        const prints = payload.data || [];
+
+        if (prints.length === 0) {
+          grid.innerHTML = `<div class="col-span-full py-12 text-center text-sm text-[#4A5564]">No alternate printings found.</div>`;
+          return;
+        }
+
+        grid.innerHTML = prints.map((p) => {
+          const imgUri = extractScryfallImage(p) || getScryfallFallbackUrl(card);
+          const pSet = (p.set || '').toUpperCase();
+          const pCn = p.collector_number || '';
+          const isCurrent =
+            (p.set || '').toLowerCase() === activeEditionTarget.currentSet &&
+            pCn.toLowerCase() === activeEditionTarget.currentCn;
+          const year = (p.released_at || '').slice(0, 4);
+
+          return `
+            <button type="button" onclick="applySelectedEdition('${escapeHtml(pSet)}', '${escapeHtml(pCn).replace(/'/g, "\\'")}', '${escapeHtml(imgUri).replace(/'/g, "\\'")}')"
+              class="text-left bg-white rounded-xl overflow-hidden border transition flex flex-col justify-between hover:border-[#2E5A78] hover:shadow-md ${
+                isCurrent ? 'border-2 border-[#1B5E48] ring-2 ring-[#1B5E48]/20' : 'border-[#DCE2E8]'
+              }">
+              <div class="relative aspect-[5/7] bg-[#E6ECF2] w-full">
+                <img src="${escapeHtml(imgUri)}" alt="${escapeHtml(p.name)} (${escapeHtml(pSet)})" loading="lazy"
+                  class="w-full h-full object-contain" />
+                ${isCurrent ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#1B5E48] text-white font-mono text-[10px] font-bold">CURRENT</span>` : ''}
+              </div>
+              <div class="p-2.5 space-y-0.5 w-full">
+                <p class="font-mono text-[11px] font-semibold text-[#11161C]">${escapeHtml(pSet)} · #${escapeHtml(pCn)}</p>
+                <p class="text-[11px] text-[#4A5564] line-clamp-1">${escapeHtml(p.set_name || '')} ${year ? '(' + year + ')' : ''}</p>
+              </div>
+            </button>
+          `;
+        }).join('');
+      } catch (err) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-xs text-red-600">Could not load printings from Scryfall. Please try again.</div>`;
+      }
+    }
+
+    function closeEditionPicker() {
+      document.getElementById('edition-picker-modal').classList.add('hidden');
+      activeEditionTarget = null;
+    }
+
+    function applySelectedEdition(newSetUpper, newCn, newImgUri) {
+      if (!activeMoxfieldView || !activeEditionTarget) return;
+      const { artistIdx, collection, itemIdx } = activeMoxfieldView;
+      const { lineIndex, cardName } = activeEditionTarget;
+      const item = siteData.artists[artistIdx][collection][itemIdx];
+      const mx = getItemMoxfield(item);
+      if (!mx) return;
+
+      const lines = String(mx.deckList || '').split(/\r?\n/);
+      const oldLine = lines[lineIndex];
+      if (oldLine !== undefined) {
+        const isEtched = /\*e\*/i.test(oldLine);
+        const isFoil = /\*f\*/i.test(oldLine);
+        const qtyMatch = oldLine.trim().match(/^(\d+x?)\s+/i);
+        const qtyPrefix = qtyMatch ? qtyMatch[1] + ' ' : '1 ';
+        const finishTag = isEtched ? ' *E*' : isFoil ? ' *F*' : '';
+        lines[lineIndex] = `${qtyPrefix}${cardName} (${newSetUpper}) ${newCn}${finishTag}`;
+      }
+
+      const updatedDeckList = lines.join('\n');
+      delete item.moxfieldPopup;
+      item.moxfield = {
+        ...mx,
+        deckList: updatedDeckList
+      };
+
+      // Pre-populate Scryfall cache so the new printing renders instantaneously
+      const newKey = `${cardName.toLowerCase()}|${newSetUpper.toLowerCase()}|${newCn.toLowerCase()}`;
+      scryfallCache[newKey] = {
+        imageUrl: newImgUri,
+        set: newSetUpper.toLowerCase(),
+        collectorNumber: newCn
+      };
+
+      activeMoxfieldView.config = item.moxfield;
+      activeMoxfieldView.parsedCards = parseMoxfieldDecklist(updatedDeckList);
+
+      markDirty();
+      closeEditionPicker();
+      renderMoxfieldCards();
+      showToast(`Edition updated to ${newSetUpper} #${newCn} (click Publish Changes to save)`);
+    }
+
+    function openInquiryModal({ artistName = '', pieceTitle = '' } = {}) {
       const modal = document.getElementById('inquiry-modal');
-      const feedback = document.getElementById('inq-feedback');
-      feedback.classList.add('hidden');
-
-      document.getElementById('inq-artist').value = artistName || 'Southern Eclipse Agency';
-      document.getElementById('inq-piece').value = pieceTitle || 'General Inquiry';
-      document.getElementById('inq-subject').value = `Southern Eclipse Inquiry — ${artistName} — ${pieceTitle}`;
-
+      document.getElementById('inq-artist').value = artistName;
+      document.getElementById('inq-piece').value = pieceTitle;
+      document.getElementById('inq-subject').value = `Southern Eclipse Inquiry — ${artistName}: ${pieceTitle}`;
+      document.getElementById('inq-feedback').classList.add('hidden');
       modal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
     }
@@ -2823,248 +3475,6 @@
         btn.textContent = 'Send Inquiry';
       }
     });
-
-    // -----------------------------------------------------------------------
-    // Moxfield Pop-up Viewer & Visual Editor Logic
-    // -----------------------------------------------------------------------
-    function parseMoxfieldDecklist(deckText) {
-      const lines = String(deckText || '').split(/\r?\n/);
-      const parsed = [];
-
-      for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line || line.startsWith('//') || line.startsWith('#') || /^(deck|sideboard|commander|maybeboard)$/i.test(line)) {
-          continue;
-        }
-        const isFoil = /\*f\*/i.test(line);
-        let clean = line.replace(/\*f\*/gi, '').replace(/\*e\*/gi, '').trim();
-        clean = clean.replace(/^\d+x?\s+/i, '');
-
-        let setCode = '';
-        let collectorNum = '';
-        const setMatch = clean.match(/\(([a-z0-9]{2,6})\)\s*([a-z0-9-]+)?\s*$/i);
-        if (setMatch) {
-          setCode = setMatch[1].toLowerCase();
-          collectorNum = setMatch[2] || '';
-          clean = clean.slice(0, setMatch.index).trim();
-        }
-
-        if (clean) {
-          parsed.push({
-            name: clean,
-            set: setCode,
-            collectorNumber: collectorNum,
-            foil: isFoil
-          });
-        }
-      }
-      return parsed;
-    }
-
-    function getScryfallFallbackUrl(card) {
-      if (card.set && card.collectorNumber) {
-        return `https://api.scryfall.com/cards/${encodeURIComponent(card.set)}/${encodeURIComponent(card.collectorNumber)}?format=image&version=normal`;
-      }
-      return `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.name)}&format=image&version=normal`;
-    }
-
-    async function hydrateScryfallImages(cards) {
-      const uncached = cards.filter((c) => {
-        const key = `${c.name}|${c.set}|${c.collectorNumber}`;
-        return !scryfallCache[key];
-      });
-      if (uncached.length === 0) return;
-
-      for (let i = 0; i < uncached.length; i += 75) {
-        const batch = uncached.slice(i, i + 75);
-        const identifiers = batch.map((c) => {
-          if (c.set && c.collectorNumber) {
-            return { set: c.set, collector_number: c.collectorNumber };
-          }
-          if (c.set) {
-            return { name: c.name, set: c.set };
-          }
-          return { name: c.name };
-        });
-
-        try {
-          const res = await fetch('https://api.scryfall.com/cards/collection', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifiers })
-          });
-          if (!res.ok) continue;
-          const payload = await res.json();
-          const returned = payload.data || [];
-
-          batch.forEach((card) => {
-            const key = `${card.name}|${card.set}|${card.collectorNumber}`;
-            const match = returned.find((r) => {
-              const rName = (r.name || '').toLowerCase();
-              const qName = card.name.toLowerCase();
-              return rName === qName || rName.startsWith(qName + ' //');
-            });
-            if (match) {
-              const imgUri = match.image_uris?.normal || match.card_faces?.[0]?.image_uris?.normal;
-              if (imgUri) scryfallCache[key] = imgUri;
-            }
-          });
-        } catch (_) {
-          // Fallback URLs handle offline/rate-limited cases seamlessly
-        }
-      }
-    }
-
-    async function openMoxfieldModal(artistIdx, collection, itemIdx) {
-      const artist = siteData.artists[artistIdx];
-      const item = artist[collection][itemIdx];
-      const mx = getItemMoxfield(item) || {};
-      const parsedCards = parseMoxfieldDecklist(mx.deckList || '');
-
-      activeMoxfieldView = {
-        artistName: artist.name,
-        cardTitle: item.title,
-        config: mx,
-        parsedCards
-      };
-
-      const isGallery = mx.mode === 'gallery';
-      document.getElementById('mx-view-badge').textContent = isGallery ? 'MOXFIELD VISUAL GALLERY' : 'MOXFIELD AP CATALOG';
-      document.getElementById('mx-view-title').textContent = `${artist.name} — ${item.title}`;
-      document.getElementById('mx-search-input').value = '';
-      document.getElementById('mx-foil-only').checked = false;
-
-      const extLink = document.getElementById('mx-external-link');
-      if (mx.deckUrl) {
-        extLink.href = mx.deckUrl;
-        extLink.classList.remove('hidden');
-      } else {
-        extLink.classList.add('hidden');
-      }
-
-      document.getElementById('moxfield-modal').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-
-      renderMoxfieldCards();
-      await hydrateScryfallImages(parsedCards);
-      if (activeMoxfieldView) renderMoxfieldCards();
-    }
-
-    function closeMoxfieldModal() {
-      document.getElementById('moxfield-modal').classList.add('hidden');
-      document.body.style.overflow = '';
-      activeMoxfieldView = null;
-    }
-
-    function renderMoxfieldCards() {
-      if (!activeMoxfieldView) return;
-      const grid = document.getElementById('mx-cards-grid');
-      const query = document.getElementById('mx-search-input').value.trim().toLowerCase();
-      const foilOnly = document.getElementById('mx-foil-only').checked;
-      const isGallery = activeMoxfieldView.config.mode === 'gallery';
-
-      const filtered = activeMoxfieldView.parsedCards.filter((c) => {
-        if (foilOnly && !c.foil) return false;
-        if (query && !c.name.toLowerCase().includes(query)) return false;
-        return true;
-      });
-
-      document.getElementById('mx-view-count').textContent = `${filtered.length} card${filtered.length === 1 ? '' : 's'}`;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-12 text-center text-sm text-[#4A5564]">No cards match your filter.</div>`;
-        return;
-      }
-
-      grid.innerHTML = filtered.map((card) => {
-        const cacheKey = `${card.name}|${card.set}|${card.collectorNumber}`;
-        const imgSrc = scryfallCache[cacheKey] || getScryfallFallbackUrl(card);
-        const finishLabel = card.foil ? 'Foil AP' : 'Non-Foil AP';
-        const setLabel = card.set ? ` · ${card.set.toUpperCase()}` : '';
-
-        return `
-          <div class="bg-white border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between shadow-2xs">
-            <div class="relative aspect-[5/7] bg-[#E6ECF2]">
-              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(card.name)}" loading="lazy"
-                onerror="this.src='https://placehold.co/488x680/DCE2E8/4A5564?text=${encodeURIComponent(card.name)}'"
-                class="w-full h-full object-contain" />
-              ${card.foil ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-400/95 text-[#11161C] font-mono text-[10px] font-bold shadow-xs">FOIL</span>` : ''}
-            </div>
-            <div class="p-3 flex flex-col gap-2">
-              <div>
-                <h4 class="font-semibold text-xs sm:text-sm text-[#11161C] leading-snug line-clamp-2">${escapeHtml(card.name)}</h4>
-                <p class="font-mono text-[11px] text-[#4A5564] mt-0.5">${finishLabel}${setLabel}</p>
-              </div>
-              ${isGallery ? '' : `
-                <button type="button" onclick="selectMoxfieldCard('${escapeHtml(card.name).replace(/'/g, "\\'")}', '${finishLabel}${setLabel}')"
-                  class="w-full py-2 px-3 rounded-lg bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-medium transition">
-                  Select this AP
-                </button>
-              `}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function selectMoxfieldCard(cardName, finishInfo) {
-      if (!activeMoxfieldView) return;
-      const artistName = activeMoxfieldView.artistName;
-      closeMoxfieldModal();
-      openInquiryModal({
-        artistName,
-        pieceTitle: `AP Selection: ${cardName} (${finishInfo})`
-      });
-    }
-
-    function openMoxfieldEditor(artistIdx, collection, itemIdx) {
-      activeMoxfieldTarget = { artistIdx, collection, itemIdx };
-      const item = siteData.artists[artistIdx][collection][itemIdx];
-      const mx = getItemMoxfield(item) || {
-        enabled: true,
-        mode: 'catalog',
-        buttonLabel: 'Browse AP List (Pop-up)',
-        deckUrl: 'https://moxfield.com',
-        deckList: ''
-      };
-
-      document.getElementById('mx-ed-enabled').checked = Boolean(mx.enabled);
-      const modeRadios = document.querySelectorAll('input[name="mx-ed-mode"]');
-      modeRadios.forEach((r) => {
-        r.checked = r.value === (mx.mode === 'gallery' ? 'gallery' : 'catalog');
-      });
-      document.getElementById('mx-ed-label').value = mx.buttonLabel || 'Browse AP List (Pop-up)';
-      document.getElementById('mx-ed-url').value = mx.deckUrl || '';
-      document.getElementById('mx-ed-decktext').value = mx.deckList || '';
-
-      document.getElementById('moxfield-editor-modal').classList.remove('hidden');
-    }
-
-    function closeMoxfieldEditor() {
-      document.getElementById('moxfield-editor-modal').classList.add('hidden');
-      activeMoxfieldTarget = null;
-    }
-
-    function saveMoxfieldEditor() {
-      if (!activeMoxfieldTarget) return;
-      const { artistIdx, collection, itemIdx } = activeMoxfieldTarget;
-      const selectedMode = document.querySelector('input[name="mx-ed-mode"]:checked')?.value || 'catalog';
-      const targetItem = siteData.artists[artistIdx][collection][itemIdx];
-
-      delete targetItem.moxfieldPopup;
-      targetItem.moxfield = {
-        enabled: document.getElementById('mx-ed-enabled').checked,
-        mode: selectedMode,
-        buttonLabel: document.getElementById('mx-ed-label').value.trim() || (selectedMode === 'gallery' ? 'View Card Gallery (Pop-up)' : 'Browse AP List (Pop-up)'),
-        deckUrl: document.getElementById('mx-ed-url').value.trim(),
-        deckList: document.getElementById('mx-ed-decktext').value
-      };
-
-      markDirty();
-      closeMoxfieldEditor();
-      renderArtists();
-      showToast('Moxfield Pop-up saved (click Publish Changes to update live site)');
-    }
 
     // -----------------------------------------------------------------------
     // Visual Editor Mutations (Inline Text, Add/Delete Cards & Artists, Status)
