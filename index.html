@@ -9,7 +9,7 @@
   <!-- Google Fonts: Unbounded, Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -94,13 +94,15 @@
       cursor: pointer;
     }
     body.edit-mode-active .editable-image-wrap::after {
-      content: 'Click to change image';
+      content: 'Manage Photos & Framing';
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(11, 14, 18, 0.62);
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(11, 14, 18, 0.64);
       color: #F8FAFC;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -108,16 +110,35 @@
       opacity: 0;
       transition: opacity 0.18s ease;
       pointer-events: none;
+      z-index: 15;
     }
     body.edit-mode-active .editable-image-wrap:hover::after {
       opacity: 1;
+    }
+
+    /* Drag-and-Drop Reordering Highlights (Visual Edit Mode) */
+    .drag-handle {
+      cursor: grab;
+      touch-action: none;
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+    .is-dragging {
+      opacity: 0.48;
+      transform: scale(0.99);
+    }
+    .drag-over-target {
+      outline: 2px solid #2E5A78 !important;
+      outline-offset: 3px;
+      background-color: rgba(46, 90, 120, 0.06) !important;
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#2E5A78] selection:text-white">
 
   <!-- =====================================================================
-       EMBEDDED GALLERY DATABASE (Updated directly by Visual Editor Mode)
+       EMBEDDED GALLERY DATABASE (Preserves 100% of your manual edits)
        ===================================================================== -->
   <script id="site-data" type="application/json">
 {
@@ -132,9 +153,14 @@
       "name": "Néstor Ossandón",
       "countryCode": "CL",
       "countryName": "Chile",
-      "specialty": "Illustrator - Fantasy art",
+      "specialty": "Illustrator - Fantasy art",
       "bio": "Chilean fantasy illustrator renowned for brooding atmospheric lighting, intricate brushwork, and iconic illustrations. Has worked for: Magic: The Gathering, Dungeons & Dragons, MARVEL and more.",
       "avatar": "https://instagram.fscl19-1.fna.fbcdn.net/v/t51.82787-19/519362239_18522678358044815_3457801262721951342_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_cat=111&_nc_map=urlgen_bucketless&ig_cache_key=GL-W9B6P8NEfR85BAG5mcKDtk-wvbmNDAQAB1501500j-ccb7-5&ccb=7-5&_nc_sid=669407&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=_31ZTpix9xoQ7kNvwFKdbgK&_nc_oc=AdoJ9fzGwJhnGccdls3m6vwN5i3IjYRd1QMFMUHovy0lZ6fFfc7pm6N8WnsWVfsx0Ws&_nc_zt=24&_nc_ht=instagram.fscl19-1.fna&_nc_gid=lQTwPUJrmK2msA4ayjae0Q&_nc_ss=7b6a8&_nc_ct=RQosPBUCFQIAAAA&oh=00_AQTgR5ppKFivJmLtr8IRjiM6pGosR-wf_e24upvws-O6RQ&oe=6AFFE970",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "nestor-st-1",
@@ -142,7 +168,16 @@
           "details": "Signed in Gold, shadow style · Regular Worldgorger card, non foil.",
           "price": "$180 USD",
           "status": "Available",
-          "image": "images/nestor-c126fe24-ef29-4cfb-9c10-6ddce5bd-1794771978898.webp"
+          "image": "images/nestor-c126fe24-ef29-4cfb-9c10-6ddce5bd-1794771978898.webp",
+          "images": [
+            {
+              "url": "images/nestor-c126fe24-ef29-4cfb-9c10-6ddce5bd-1794771978898.webp",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nestor-st-2",
@@ -150,7 +185,16 @@
           "details": "Non Foil AP · Mixed Technique, regular gold signature in the front",
           "price": "$180 USD",
           "status": "Available",
-          "image": "images/nestor-8c486d2a-9d40-43bb-947a-653043f2-1794772085771.webp"
+          "image": "images/nestor-8c486d2a-9d40-43bb-947a-653043f2-1794772085771.webp",
+          "images": [
+            {
+              "url": "images/nestor-8c486d2a-9d40-43bb-947a-653043f2-1794772085771.webp",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nestor-st-3",
@@ -158,7 +202,16 @@
           "details": "White playmat, painted with markers and different ink techniques. Sold with a plastic tube in order to protect it.",
           "price": "$550 USD",
           "status": "Sold",
-          "image": "images/nestor-dihada-playmat-1794772163359.webp"
+          "image": "images/nestor-dihada-playmat-1794772163359.webp",
+          "images": [
+            {
+              "url": "images/nestor-dihada-playmat-1794772163359.webp",
+              "fit": "contain",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -167,21 +220,55 @@
           "title": "Command Towers",
           "details": "They start at 300 with a black-and-white sketch. Goes up depending on Complexity and technique.",
           "price": "From $300 USD",
-          "image": "images/nestor-commandtower-examples-1794772232610.webp"
+          "image": "images/nestor-commandtower-examples-1794772232610.webp",
+          "images": [
+            {
+              "url": "images/nestor-commandtower-examples-1794772232610.webp",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nestor-cm-2",
           "title": "Many cards to choose",
-          "details": "You can choose and pick cards from this link as an AP:https://moxfield.com/decks/S0mnQeoWsUqbNYQtzctlXgBlanks are only sold with other commissions",
+          "details": "You can choose and pick cards from this link as an AP: https://moxfield.com/decks/S0mnQeoWsUqbNYQtzctlXg — Blanks are only sold with other commissions",
           "price": "From $25 USD",
-          "image": "images/nestor-whatsapp-image-2026-07-21-at-4-2-1794772307968.webp"
+          "image": "images/nestor-whatsapp-image-2026-07-21-at-4-2-1794772307968.webp",
+          "images": [
+            {
+              "url": "images/nestor-whatsapp-image-2026-07-21-at-4-2-1794772307968.webp",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com/decks/S0mnQeoWsUqbNYQtzctlXg",
+            "deckList": "1 Bonecaller Cleric (J25) 112\n1 Bronze Cudgels (NEO) 240\n1 Charge the Sanctum (FRA) 125\n1 Command Tower (PW25) 17 *F*\n1 Crippling Fear (SCD) 72\n1 Cultivate (PW23) 6 *F*\n1 Edgar, Charmed Groom\n1 Island\n1 Komainu Battle Armor\n1 Koma, World-Eater\n1 Norn's Decree\n1 Nyxborn Behemoth\n1 Olivia's Wrath\n1 Thieving Varmint\n1 Vanguard of the Restless\n1 Worldgorger Dragon"
+          }
         },
         {
           "id": "nestor-cm-3",
           "title": "Full acrylic painting",
           "details": "Museum-grade bespoke miniature acrylic scene on AP reverse. Néstor can do anything when he has creative freedom, no matter the subject.",
           "price": "From $220 USD",
-          "image": "images/nestor-whatsapp-image-2026-11-08-at-11--1794772428047.webp"
+          "image": "images/nestor-whatsapp-image-2026-11-08-at-11--1794772428047.webp",
+          "images": [
+            {
+              "url": "images/nestor-whatsapp-image-2026-11-08-at-11--1794772428047.webp",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "portfolio": [
@@ -189,13 +276,31 @@
           "id": "nestor-pf-1",
           "title": "Cathedral of Ash",
           "details": "Official TCG Release · Oil & Digital",
-          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nestor-pf-2",
           "title": "Eclipsed Sovereign",
           "details": "Key Art · Dark Fantasy Series",
-          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -207,6 +312,11 @@
       "specialty": "Painterly Realism · Mythic Characters & Dynamic Light",
       "bio": "Santiago-based illustrator combining classical painterly texture with high-contrast dramatic compositions for premier tabletop and TCG worlds.",
       "avatar": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "wero-st-1",
@@ -214,7 +324,16 @@
           "details": "Non-Foil AP · Signed & dated by the artist",
           "price": "$55 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "wero-st-2",
@@ -222,7 +341,33 @@
           "details": "Hand-painted border extension in acrylics · 1/1",
           "price": "$190 USD",
           "status": "Sold",
-          "image": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "wero-st-3",
+          "title": "Sunlit Bastion — Foil Artist Proof",
+          "details": "Foil AP · Signed in archival gold ink · Numbered",
+          "price": "$75 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -231,14 +376,55 @@
           "title": "Extended Art Card Alter",
           "details": "Seamless hand-painted acrylic extension over standard card frame.",
           "price": "From $140 USD",
-          "image": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "wero-cm-2",
           "title": "Portrait Sketch on AP",
           "details": "Graphite and ink character bust on white Artist Proof reverse.",
           "price": "From $95 USD",
-          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "wero-cm-3",
+          "title": "Many cards to choose",
+          "details": "Explore Wero Gallo's illustrated cards and available Artist Proofs for custom sketches or alters.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Boros Charm\n1 Aurelia, the Warleader *F*\n1 Swords to Plowshares\n1 Lightning Helix"
+          }
         }
       ],
       "portfolio": [
@@ -246,13 +432,31 @@
           "id": "wero-pf-1",
           "title": "Herald of the Dawn",
           "details": "TCG Card Illustration · Acrylic & Digital",
-          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "wero-pf-2",
           "title": "Ironbound Duelist",
           "details": "Character Concept & Card Frame",
-          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -264,6 +468,11 @@
       "specialty": "Surreal Mythology · Expressive Line & Chromatic Depth",
       "bio": "Visual artist and illustrator crafting bold mythological forms, intricate linework, and vivid storytelling across collectible card releases.",
       "avatar": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "peyeyo-st-1",
@@ -271,7 +480,16 @@
           "details": "Foil AP · Signed with custom geometric glyph",
           "price": "$75 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "peyeyo-st-2",
@@ -279,7 +497,33 @@
           "details": "Non-Foil AP · Hand-embellished gold leaf detail on reverse",
           "price": "$210 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "peyeyo-st-3",
+          "title": "Andean Equinox — Signed Proof",
+          "details": "Non-Foil AP · Signed & numbered by Peyeyo",
+          "price": "$65 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -288,14 +532,55 @@
           "title": "Glyph Signature & Doodles",
           "details": "Signature accompanied by bespoke miniature line-art sigil.",
           "price": "From $25 USD",
-          "image": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "peyeyo-cm-2",
           "title": "Mixed-Media AP Back",
           "details": "Ink, gouache, and metallic leaf custom artwork on AP reverse.",
           "price": "From $185 USD",
-          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "peyeyo-cm-3",
+          "title": "Many cards to choose",
+          "details": "Open Peyeyo's card catalog to browse available proofs or view illustrated releases.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Ponder\n1 Brainstorm *F*\n1 Mystical Tutor\n1 Counterspell"
+          }
         }
       ],
       "portfolio": [
@@ -303,7 +588,31 @@
           "id": "peyeyo-pf-1",
           "title": "Oracle of the Andes",
           "details": "Special Guest Illustration",
-          "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "peyeyo-pf-2",
+          "title": "Chromatic Spirit",
+          "details": "Official Card Art · Mixed Media",
+          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -315,6 +624,11 @@
       "specialty": "Cosmic Horror · Psychedelic Geometry & Arcane Relics",
       "bio": "Chilean illustrator celebrated for cosmic horror aesthetics, surreal architectural landscapes, and unmistakable graphic intensity.",
       "avatar": "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "badilla-st-1",
@@ -322,7 +636,16 @@
           "details": "Non-Foil AP · Signed in archival black & cyan",
           "price": "$60 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "badilla-st-2",
@@ -330,7 +653,33 @@
           "details": "Non-Foil AP · Surrealist acrylic composition on reverse",
           "price": "$250 USD",
           "status": "Reserved",
-          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "badilla-st-3",
+          "title": "Astral Obelisk — Foil Artist Proof",
+          "details": "Foil AP · Signed with geometric sigil",
+          "price": "$75 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -339,14 +688,55 @@
           "title": "Cosmic Ink Sketch AP",
           "details": "Intricate stippled ink illustration on white-back Artist Proof.",
           "price": "From $115 USD",
-          "image": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "badilla-cm-2",
           "title": "Full Surrealist Back Painting",
           "details": "Vibrant acrylic painting on AP back with custom theme.",
           "price": "From $240 USD",
-          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "badilla-cm-3",
+          "title": "Many cards to choose",
+          "details": "Browse Badillafloyd's available Artist Proofs to pick a card for custom ink or acrylic work.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Thoughtseize\n1 Dark Ritual *F*\n1 Cabal Coffers\n1 Entomb"
+          }
         }
       ],
       "portfolio": [
@@ -354,7 +744,31 @@
           "id": "badilla-pf-1",
           "title": "Sanctum of Echoes",
           "details": "TCG Land & Environment Series",
-          "image": "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "badilla-pf-2",
+          "title": "Eldritch Horizon",
+          "details": "Showcase Edition · Acrylic & Digital",
+          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -366,6 +780,11 @@
       "specialty": "Neo-Muralism · Botanical Mysticism & Radiant Symbolism",
       "bio": "Bogotá-based visual artist and muralist bringing vibrant tropical symbolism, sacred geometry, and luminous color palettes to collectible card art.",
       "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "ledania-st-1",
@@ -373,7 +792,16 @@
           "details": "Foil AP · Signed in iridescent gold ink",
           "price": "$85 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "ledania-st-2",
@@ -381,7 +809,33 @@
           "details": "Non-Foil AP · Vivid acrylic back painting",
           "price": "$310 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "ledania-st-3",
+          "title": "Sacred Canopy — Signed Artist Proof",
+          "details": "Non-Foil AP · Signed with botanical flourish",
+          "price": "$70 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -390,14 +844,55 @@
           "title": "Signature & Botanical Motif",
           "details": "Artist signature paired with hand-drawn floral/totemic emblem.",
           "price": "From $30 USD",
-          "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "ledania-cm-2",
           "title": "Bespoke Acrylic Back Painting",
           "details": "Signature neo-muralist composition painted in miniature on AP reverse.",
           "price": "From $290 USD",
-          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "ledania-cm-3",
+          "title": "Many cards to choose",
+          "details": "Browse Ledania's available Artist Proofs and Special Guest releases in a visual pop-up.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Birds of Paradise\n1 Cultivate *F*\n1 Rampant Growth\n1 Sol Ring"
+          }
         }
       ],
       "portfolio": [
@@ -405,7 +900,31 @@
           "id": "ledania-pf-1",
           "title": "Canopy of Mirrors",
           "details": "Showcase Edition · Mixed Media",
-          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "ledania-pf-2",
+          "title": "Totem of Sunlight",
+          "details": "Official Card Art · Acrylic & Digital",
+          "image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -417,6 +936,11 @@
       "specialty": "Ethereal Portraiture · Luminous Enchantments & Narrative Magic",
       "bio": "Brazilian illustrator known for expressive character emotion, delicate lighting, and rich narrative enchantment scenes in international TCG sets.",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "nathanna-st-1",
@@ -424,7 +948,16 @@
           "details": "Non-Foil AP · Signed with delicate star flourish",
           "price": "$65 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nathanna-st-2",
@@ -432,7 +965,33 @@
           "details": "Non-Foil AP · Original miniature character painting on reverse",
           "price": "$230 USD",
           "status": "Sold",
-          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "nathanna-st-3",
+          "title": "Celestial Reverie — Foil Artist Proof",
+          "details": "Foil AP · Signed in silver ink · Limited studio allocation",
+          "price": "$80 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -441,14 +1000,55 @@
           "title": "Character Bust Sketch AP",
           "details": "Pencil and sepia ink character portrait on AP reverse.",
           "price": "From $110 USD",
-          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "nathanna-cm-2",
           "title": "Full Gouache Back Painting",
           "details": "Luminous full-color gouache & acrylic scene on AP reverse.",
           "price": "From $220 USD",
-          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "nathanna-cm-3",
+          "title": "Many cards to choose",
+          "details": "Explore Nathanna Erica's card catalog to select an Artist Proof for portrait sketch or gouache painting.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Generous Gift\n1 Path to Exile *F*\n1 Enlightened Tutor\n1 Ephemerate"
+          }
         }
       ],
       "portfolio": [
@@ -456,7 +1056,31 @@
           "id": "nathanna-pf-1",
           "title": "Vigil of the Fae",
           "details": "Official Card Art · Digital Painting",
-          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "nathanna-pf-2",
+          "title": "Lantern Bearer",
+          "details": "Narrative Fantasy Series",
+          "image": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     },
@@ -468,6 +1092,11 @@
       "specialty": "High Fantasy Landscapes · Monumental Architecture & Dragons",
       "bio": "Bolivian concept artist and illustrator crafting sweeping high-fantasy worlds, ancient citadels, and awe-inspiring mythical creatures.",
       "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80",
+      "sectionOrder": [
+        "stock",
+        "commissions",
+        "portfolio"
+      ],
       "stock": [
         {
           "id": "daniel-st-1",
@@ -475,7 +1104,16 @@
           "details": "Non-Foil AP · Signed in bronze metallic ink",
           "price": "$55 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "daniel-st-2",
@@ -483,7 +1121,33 @@
           "details": "Foil AP · Original miniature landscape painting on reverse",
           "price": "$240 USD",
           "status": "Available",
-          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "daniel-st-3",
+          "title": "Highland Sanctuary — Signed AP",
+          "details": "Non-Foil AP · Signed & dated by Daniel Cotter",
+          "price": "$55 USD",
+          "status": "Available",
+          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ],
       "commissions": [
@@ -492,14 +1156,55 @@
           "title": "Landscape Ink Study AP",
           "details": "Architectural or mountain vista drawn in archival fineliner & wash.",
           "price": "From $105 USD",
-          "image": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         },
         {
           "id": "daniel-cm-2",
           "title": "Full Scenic Back Painting",
           "details": "Custom fantasy environment or dragon painted in acrylics on AP back.",
           "price": "From $235 USD",
-          "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "daniel-cm-3",
+          "title": "Many cards to choose",
+          "details": "Browse Daniel Cotter's available Artist Proofs to pick a card for a custom landscape or dragon painting.",
+          "price": "AP + Commission",
+          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ],
+          "moxfield": {
+            "enabled": true,
+            "mode": "catalog",
+            "buttonLabel": "Browse AP List (Pop-up)",
+            "deckUrl": "https://moxfield.com",
+            "deckList": "1 Command Tower\n1 Exotic Orchard *F*\n1 Reliquary Tower\n1 Arcane Signet"
+          }
         }
       ],
       "portfolio": [
@@ -507,7 +1212,31 @@
           "id": "daniel-pf-1",
           "title": "Throne of the Altiplano",
           "details": "Worldbuilding & Card Illustration",
-          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80"
+          "image": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
+        },
+        {
+          "id": "daniel-pf-2",
+          "title": "Dragonspire Peak",
+          "details": "Fantasy Landscape · Oil & Digital",
+          "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+          "images": [
+            {
+              "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+              "fit": "cover",
+              "posX": 50,
+              "posY": 50,
+              "zoom": 100
+            }
+          ]
         }
       ]
     }
@@ -549,33 +1278,26 @@
   </div>
 
   <!-- =====================================================================
-       STICKY MINIMAL AGENCY HEADER
+       MAIN NAVIGATION HEADER
        ===================================================================== -->
-  <header id="main-header" class="sticky top-0 z-40 bg-[#FAFBFD]/90 backdrop-blur-md border-b border-[#DCE2E8]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <!-- Brand Identity -->
-      <a href="#top" class="flex items-center gap-3 group focus:outline-none">
-        <!-- Custom Geometric Eclipse SVG Mark -->
-        <svg class="w-8 h-8 text-[#11161C] shrink-0 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="18" cy="18" r="15.5" stroke="#11161C" stroke-width="1.5"/>
-          <circle cx="20.5" cy="15.5" r="10.5" fill="#11161C"/>
-          <circle cx="15" cy="21" r="9.5" fill="#FAFBFD" stroke="#2E5A78" stroke-width="1.25"/>
-          <circle cx="26.5" cy="9.5" r="1.75" fill="#1B5E48"/>
-        </svg>
-        <span id="brand-title-header" class="font-display-lower font-semibold text-lg sm:text-xl text-[#11161C] tracking-tight">
+  <header id="main-header" class="sticky top-0 z-40 bg-[#FAFBFD]/90 backdrop-blur-md border-b border-[#DCE2E8] transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="#" class="flex items-center gap-3 group">
+        <span class="w-7 h-7 rounded-full bg-[#11161C] flex items-center justify-center relative overflow-hidden shrink-0">
+          <span class="w-4 h-4 rounded-full bg-[#FAFBFD] translate-x-1 -translate-y-0.5 transition-transform group-hover:translate-x-1.5"></span>
+        </span>
+        <span id="brand-title-header" class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
           southern eclipse
         </span>
       </a>
 
-      <!-- Right Actions -->
-      <div class="flex items-center gap-3 sm:gap-5">
-        <span class="hidden md:inline-flex items-center gap-1.5 font-mono text-xs text-[#4A5564]">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#1B5E48]"></span>
-          South America · Worldwide Shipping
+      <div class="flex items-center gap-3">
+        <span class="hidden md:inline-block font-mono text-xs text-[#4A5564]">
+          SOUTH AMERICAN ART &amp; ARTIST PROOFS
         </span>
-        <button type="button" onclick="openInquiryModal({ artistName: 'Southern Eclipse Agency', pieceTitle: 'General Collector / Agency Inquiry' })"
-          class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs sm:text-sm font-medium transition shadow-sm">
-          General Inquiry
+        <button type="button" onclick="openInquiryModal({ artistName: 'Southern Eclipse Agency', pieceTitle: 'General Collector / Commission Inquiry' })"
+          class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs sm:text-sm font-medium transition shadow-xs">
+          Inquire
         </button>
       </div>
     </div>
@@ -584,29 +1306,23 @@
   <!-- =====================================================================
        HERO & COLLECTOR POLICY BANNER
        ===================================================================== -->
-  <section id="top" class="border-b border-[#DCE2E8] bg-[#FAFBFD]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      <div class="max-w-3xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1F4F7] border border-[#DCE2E8] font-mono text-xs text-[#2E5A78] mb-4">
-          <span>CL · CO · BR · BO</span>
-          <span class="text-[#DCE2E8]">|</span>
-          <span>ARTIST REPRESENTATION &amp; ARCHIVE</span>
+  <section class="bg-[#FAFBFD] border-b border-[#DCE2E8]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div class="max-w-3xl space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1F4F7] border border-[#DCE2E8] font-mono text-xs text-[#2E5A78]">
+          <span>CHILE · COLOMBIA · BRAZIL · BOLIVIA</span>
         </div>
 
-        <h1 id="hero-title" class="font-display-lower font-bold text-3xl sm:text-5xl text-[#11161C] leading-tight mb-4">
+        <h1 id="hero-title" class="font-display-lower font-semibold text-3xl sm:text-5xl text-[#11161C] leading-[1.12]">
           southern eclipse
         </h1>
 
-        <p id="hero-tagline" class="text-base sm:text-xl text-[#4A5564] font-normal leading-relaxed mb-6">
+        <p id="hero-tagline" class="text-base sm:text-xl text-[#4A5564] font-normal leading-relaxed">
           South American Artist Proofs, Original Card Works &amp; Private Commissions
         </p>
 
-        <!-- Collector Notice Box -->
-        <div class="p-4 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] flex items-start gap-3">
-          <svg class="w-5 h-5 text-[#1B5E48] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <p id="hero-collector-note" class="text-xs sm:text-sm text-[#4A5564] leading-relaxed">
+        <div class="pt-2">
+          <p id="hero-collector-note" class="text-xs sm:text-sm text-[#4A5564] bg-[#F1F4F7] border border-[#DCE2E8] rounded-xl px-4 py-3 leading-relaxed">
             First Come, First Serve on all listed Artist Proofs &amp; originals. Worldwide tracked shipping directly from South America. Commission slots open selectively per artist.
           </p>
         </div>
@@ -615,51 +1331,47 @@
   </section>
 
   <!-- =====================================================================
-       FILTER & QUICK-JUMP NAVIGATION BAR
+       STICKY FILTER & ARTIST JUMP BAR
        ===================================================================== -->
   <div class="sticky top-16 z-30 bg-[#F1F4F7]/95 backdrop-blur-md border-b border-[#DCE2E8]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
-      <!-- Top Row: Country Filter Pills + In-Stock Toggle -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 space-y-2.5">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div id="country-filters" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-          <!-- Populated dynamically -->
-        </div>
+        <!-- Country Filter Pills -->
+        <div id="country-filters" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
 
-        <!-- In-Stock APs Only Toggle Switch -->
-        <label class="inline-flex items-center gap-2.5 cursor-pointer select-none bg-[#FAFBFD] px-3 py-1.5 rounded-xl border border-[#DCE2E8]">
-          <input type="checkbox" id="toggle-instock" class="sr-only peer" />
-          <div class="relative w-9 h-5 bg-[#DCE2E8] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1B5E48]"></div>
+        <!-- In-Stock APs Toggle -->
+        <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-[#FAFBFD] px-3 py-1.5 rounded-full border border-[#DCE2E8] hover:border-[#2E5A78] transition">
+          <input type="checkbox" id="toggle-instock" class="rounded text-[#1B5E48] focus:ring-0" />
           <span class="font-mono text-xs font-medium text-[#11161C]">In-Stock APs Only</span>
         </label>
       </div>
 
-      <!-- Bottom Row: Quick Artist Jump Pills -->
-      <div id="artist-jump-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-        <!-- Populated dynamically -->
-      </div>
+      <!-- Artist Quick-Jump Rail -->
+      <div id="artist-jump-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
     </div>
   </div>
 
   <!-- =====================================================================
-       MAIN ARTISTS GALLERY FEED
+       MAIN ARTISTS & CURATED GALLERIES CONTAINER
        ===================================================================== -->
-  <main id="artists-container" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12 sm:space-y-16">
-    <!-- Populated dynamically from #site-data -->
+  <main id="artists-container" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-12">
+    <!-- Rendered dynamically by renderAll() -->
   </main>
 
   <!-- =====================================================================
-       MINIMAL FOOTER
+       FOOTER
        ===================================================================== -->
-  <footer class="bg-[#FAFBFD] border-t border-[#DCE2E8] mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A5564]">
-      <div class="flex items-center gap-2.5">
-        <span class="font-display-lower font-semibold text-sm text-[#11161C]">southern eclipse</span>
-        <span>·</span>
-        <span>South American Art &amp; Artist Proofs Representation</span>
+  <footer class="bg-[#FAFBFD] border-t border-[#DCE2E8] mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="space-y-1">
+        <p class="font-display-lower font-semibold text-base text-[#11161C]">southern eclipse</p>
+        <p class="text-xs text-[#4A5564]">Representing South American illustrators for Artist Proofs, original card art &amp; private commissions.</p>
       </div>
-      <div class="flex items-center gap-4 font-mono">
-        <span>Worldwide Tracked Shipping</span>
-        <button type="button" onclick="openInquiryModal({ artistName: 'Southern Eclipse Agency', pieceTitle: 'General Collector Inquiry' })" class="text-[#2E5A78] hover:underline">
+
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="font-mono text-xs text-[#4A5564]">Worldwide Tracked Shipping · PayPal / Wire</span>
+        <button type="button" onclick="openInquiryModal({ artistName: 'Southern Eclipse Agency', pieceTitle: 'Agency & Shipping Question' })"
+          class="px-4 py-2 rounded-xl bg-[#11161C] hover:bg-[#2E5A78] text-white text-xs font-medium transition">
           Contact Agency
         </button>
       </div>
@@ -667,40 +1379,34 @@
   </footer>
 
   <!-- =====================================================================
-       DARKROOM LIGHTBOX MODAL (#0B0E12)
+       DARKROOM FULL-SCREEN LIGHTBOX MODAL
        ===================================================================== -->
-  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-[#0B0E12]/95 text-[#F8FAFC] flex flex-col justify-between p-4 sm:p-6" role="dialog" aria-modal="true">
-    <!-- Lightbox Top Bar -->
-    <div class="flex items-center justify-between gap-4 max-w-6xl w-full mx-auto">
+  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-[#0B0E12]/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-between gap-4 text-slate-300">
       <div class="flex items-center gap-3">
-        <span id="lb-category" class="px-2.5 py-1 rounded-md bg-white/10 font-mono text-xs text-slate-300">PORTFOLIO</span>
+        <span id="lb-category" class="font-mono text-xs text-sky-300 uppercase tracking-wider">GALLERY</span>
         <span id="lb-counter" class="font-mono text-xs text-slate-400">1 / 1</span>
       </div>
-      <button type="button" onclick="closeLightbox()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition" aria-label="Close lightbox">
+      <button type="button" onclick="closeLightbox()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition" aria-label="Close Lightbox">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
-    <!-- Lightbox Center Image & Navigation -->
     <div class="relative flex-1 flex items-center justify-center my-4 min-h-0">
-      <button type="button" onclick="navigateLightbox(-1)" class="absolute left-0 sm:left-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition" aria-label="Previous image">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      <button type="button" onclick="navigateLightbox(-1)" class="absolute left-1 sm:left-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl flex items-center justify-center transition" aria-label="Previous image">
+        ‹
       </button>
-
-      <img id="lb-image" src="" alt="" onerror="this.src='https://placehold.co/800x600/1E293B/F8FAFC?text=Artwork+Preview'"
-        class="max-h-[68vh] max-w-[85vw] sm:max-w-[78vw] object-contain rounded-xl border border-white/10 shadow-2xl" />
-
-      <button type="button" onclick="navigateLightbox(1)" class="absolute right-0 sm:right-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition" aria-label="Next image">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <img id="lb-image" src="" alt="" class="max-h-full max-w-full object-contain rounded-xl shadow-2xl" />
+      <button type="button" onclick="navigateLightbox(1)" class="absolute right-1 sm:right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl flex items-center justify-center transition" aria-label="Next image">
+        ›
       </button>
     </div>
 
-    <!-- Lightbox Metadata Footer -->
-    <div class="max-w-4xl w-full mx-auto bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <p id="lb-artist" class="font-mono text-xs text-sky-300 uppercase tracking-wider mb-0.5">Artist Name</p>
-        <h3 id="lb-title" class="font-display-lower font-semibold text-base sm:text-lg text-white">Artwork Title</h3>
-        <p id="lb-details" class="text-xs sm:text-sm text-slate-300 mt-0.5">Details</p>
+    <div class="max-w-3xl w-full mx-auto bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-white">
+      <div class="space-y-0.5">
+        <p id="lb-artist" class="font-mono text-xs text-sky-300"></p>
+        <h3 id="lb-title" class="font-semibold text-base sm:text-lg"></h3>
+        <p id="lb-details" class="text-xs text-slate-300"></p>
       </div>
       <div class="flex items-center gap-3 shrink-0">
         <span id="lb-price" class="font-mono text-sm font-medium text-emerald-300"></span>
@@ -712,35 +1418,35 @@
   </div>
 
   <!-- =====================================================================
-       WEB3FORMS COLLECTOR INQUIRY MODAL
+       COLLECTOR INQUIRY MODAL (Web3Forms)
        ===================================================================== -->
-  <div id="inquiry-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/70 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-      <div class="flex items-start justify-between gap-4 mb-5">
+  <div id="inquiry-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="font-mono text-xs text-[#2E5A78] uppercase tracking-wider">Direct Collector Desk</span>
-          <h3 class="font-display-lower font-semibold text-xl text-[#11161C] mt-0.5">Send Inquiry</h3>
+          <span class="font-mono text-xs text-[#2E5A78]">DIRECT COLLECTOR INQUIRY</span>
+          <h3 class="font-display-lower font-semibold text-xl text-[#11161C] mt-0.5">Reserve AP or Request Commission</h3>
         </div>
-        <button type="button" onclick="closeInquiryModal()" class="p-2 rounded-xl hover:bg-[#F1F4F7] text-[#4A5564] transition" aria-label="Close modal">
+        <button type="button" onclick="closeInquiryModal()" class="p-1.5 rounded-lg hover:bg-[#F1F4F7] text-[#4A5564]" aria-label="Close">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <form id="web3forms-form" class="space-y-4">
         <input type="hidden" name="access_key" value="9e8db5e7-b092-424a-8713-8239d75d27b4" />
-        <input type="hidden" name="from_name" value="Southern Eclipse Gallery" />
         <input type="hidden" id="inq-subject" name="subject" value="Southern Eclipse Collector Inquiry" />
+        <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-mono text-xs text-[#4A5564] mb-1">Artist</label>
+            <label for="inq-artist" class="block font-mono text-xs text-[#4A5564] mb-1">Artist</label>
             <input type="text" id="inq-artist" name="artist" readonly
-              class="w-full px-3.5 py-2 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] text-sm font-medium text-[#11161C] focus:outline-none" />
+              class="w-full px-3.5 py-2 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] text-xs sm:text-sm font-medium text-[#11161C]" />
           </div>
           <div>
-            <label class="block font-mono text-xs text-[#4A5564] mb-1">Piece / Commission</label>
-            <input type="text" id="inq-piece" name="piece_or_commission"
-              class="w-full px-3.5 py-2 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] text-sm font-medium text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+            <label for="inq-piece" class="block font-mono text-xs text-[#4A5564] mb-1">Selected Piece / Tier</label>
+            <input type="text" id="inq-piece" name="piece_or_commission" readonly
+              class="w-full px-3.5 py-2 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] text-xs sm:text-sm font-medium text-[#11161C]" />
           </div>
         </div>
 
@@ -748,35 +1454,34 @@
           <div>
             <label for="inq-name" class="block font-mono text-xs text-[#4A5564] mb-1">Your Name *</label>
             <input type="text" id="inq-name" name="name" required placeholder="Alex Rivera"
-              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+              class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
           </div>
           <div>
-            <label for="inq-contact" class="block font-mono text-xs text-[#4A5564] mb-1">Email or Discord Handle *</label>
-            <input type="text" id="inq-contact" name="email_or_discord" required placeholder="alex@email.com or @alexmtg"
-              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+            <label for="inq-email" class="block font-mono text-xs text-[#4A5564] mb-1">Email Address *</label>
+            <input type="email" id="inq-email" name="email" required placeholder="collector@example.com"
+              class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
           </div>
         </div>
 
         <div>
           <label for="inq-country" class="block font-mono text-xs text-[#4A5564] mb-1">Shipping Country *</label>
-          <input type="text" id="inq-country" name="shipping_country" required placeholder="United States, Germany, Japan, Chile..."
-            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+          <input type="text" id="inq-country" name="shipping_country" required placeholder="United States / Germany / Japan..."
+            class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
         </div>
 
         <div>
-          <label for="inq-message" class="block font-mono text-xs text-[#4A5564] mb-1">Message / Commission Details *</label>
-          <textarea id="inq-message" name="message" rows="3" required placeholder="Let us know which piece you'd like to claim or describe your commission idea..."
-            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]"></textarea>
+          <label for="inq-message" class="block font-mono text-xs text-[#4A5564] mb-1">Notes / Commission Details *</label>
+          <textarea id="inq-message" name="message" rows="3" required placeholder="Let us know your preferred card, sketch idea, or shipping questions..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]"></textarea>
         </div>
 
-        <!-- Inline Form Feedback Box -->
-        <div id="inq-feedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-medium"></div>
+        <div id="inq-feedback" class="hidden"></div>
 
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-          <button type="button" onclick="closeInquiryModal()" class="px-4 py-2.5 rounded-xl border border-[#DCE2E8] text-xs sm:text-sm font-medium text-[#4A5564] hover:bg-[#F1F4F7] transition">
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeInquiryModal()" class="px-4 py-2.5 rounded-xl border border-[#DCE2E8] text-xs font-medium text-[#4A5564]">
             Cancel
           </button>
-          <button type="submit" id="inq-submit-btn" class="px-5 py-2.5 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs sm:text-sm font-medium transition shadow-sm">
+          <button type="submit" id="inq-submit-btn" class="px-5 py-2.5 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs sm:text-sm font-semibold transition shadow-xs">
             Send Inquiry
           </button>
         </div>
@@ -785,48 +1490,41 @@
   </div>
 
   <!-- =====================================================================
-       VISUAL EDITOR: GITHUB TOKEN SETUP MODAL
+       GITHUB TOKEN SETUP MODAL (Visual Editor Mode)
        ===================================================================== -->
   <div id="gh-token-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="font-mono text-xs text-[#2E5A78]">GITHUB DIRECT PUBLISH SETUP</span>
-          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">GitHub Access Token</h3>
+          <span class="font-mono text-xs text-[#2E5A78]">DIRECT GITHUB PUBLISHING</span>
+          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Connect GitHub Key</h3>
         </div>
         <button type="button" onclick="closeGhTokenModal()" class="p-1.5 rounded-lg hover:bg-[#F1F4F7] text-[#4A5564]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <p class="text-xs sm:text-sm text-[#4A5564] leading-relaxed">
-        Your token is stored <strong>only in this browser's localStorage</strong> and is never written into the HTML file. Only someone with your personal GitHub token can publish updates to <code class="font-mono text-xs bg-[#F1F4F7] px-1.5 py-0.5 rounded">albertartmatt-svg/southern-eclipse</code>.
+      <p class="text-xs text-[#4A5564] leading-relaxed">
+        Paste a Fine-Grained Personal Access Token with <strong>Contents: Read and write</strong> access to <code class="bg-[#F1F4F7] px-1.5 py-0.5 rounded font-mono text-[#11161C]">albertartmatt-svg/southern-eclipse</code>. Saved locally in your browser only.
       </p>
 
-      <ol class="text-xs text-[#4A5564] space-y-1.5 list-decimal list-inside bg-[#F1F4F7] p-3.5 rounded-xl border border-[#DCE2E8]">
-        <li>Open <strong>GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong>.</li>
-        <li>Click <strong>Generate new token</strong> and select repository <code class="font-mono text-[#11161C]">southern-eclipse</code>.</li>
-        <li>Under <strong>Repository permissions → Contents</strong>, set access to <strong>Read and write</strong>.</li>
-        <li>Generate, copy, and paste the token below:</li>
-      </ol>
-
       <div>
-        <label for="gh-token-input" class="block font-mono text-xs text-[#4A5564] mb-1">Fine-Grained Personal Access Token</label>
+        <label for="gh-token-input" class="block font-mono text-xs text-[#4A5564] mb-1">Personal Access Token</label>
         <input type="password" id="gh-token-input" placeholder="github_pat_..."
-          class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+          class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
       </div>
 
-      <div id="gh-token-status" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+      <div id="gh-token-status" class="hidden"></div>
 
       <div class="flex items-center justify-between gap-2 pt-1">
-        <button type="button" onclick="clearGhToken()" class="text-xs font-mono text-red-600 hover:underline">
-          Remove Saved Token
+        <button type="button" onclick="clearGhToken()" class="px-3 py-2 rounded-xl text-xs font-medium text-red-600 hover:bg-red-50 transition">
+          Clear Key
         </button>
         <div class="flex items-center gap-2">
           <button type="button" onclick="closeGhTokenModal()" class="px-3.5 py-2 rounded-xl border border-[#DCE2E8] text-xs font-medium text-[#4A5564]">
-            Cancel
+            Close
           </button>
-          <button type="button" onclick="saveAndVerifyGhToken()" id="btn-verify-token" class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-semibold">
+          <button type="button" id="btn-verify-token" onclick="saveAndVerifyGhToken()" class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-semibold transition">
             Verify &amp; Save Token
           </button>
         </div>
@@ -835,29 +1533,82 @@
   </div>
 
   <!-- =====================================================================
-       VISUAL EDITOR: IMAGE MANAGER MODAL (Local .webp Compression or URL)
+       VISUAL EDITOR: MULTI-PHOTO & FRAMING IMAGE MANAGER MODAL
        ===================================================================== -->
   <div id="image-editor-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="font-mono text-xs text-[#2E5A78]">IMAGE ASSET MANAGER</span>
-          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Update Image</h3>
+          <span class="font-mono text-xs text-[#2E5A78]">MULTI-PHOTO &amp; FRAMING MANAGER</span>
+          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Card Photos &amp; Framing</h3>
         </div>
         <button type="button" onclick="closeImageEditorModal()" class="p-1.5 rounded-lg hover:bg-[#F1F4F7] text-[#4A5564]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <!-- Preview Box -->
-      <div class="rounded-xl overflow-hidden border border-[#DCE2E8] bg-[#F1F4F7] aspect-[4/3] flex items-center justify-center">
-        <img id="img-ed-preview" src="" alt="Preview" onerror="this.src='https://placehold.co/600x450/DCE2E8/4A5564?text=Preview'" class="w-full h-full object-cover" />
+      <!-- Multi-Photo Slide Strip (Shown for card items) -->
+      <div id="img-ed-carousel-bar" class="space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span id="img-ed-slide-count" class="font-mono text-xs text-[#4A5564]">Photo 1 of 1</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="moveEditorSlide(-1)" title="Move photo left" class="px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] font-mono text-xs text-[#11161C]">←</button>
+            <button type="button" onclick="moveEditorSlide(1)" title="Move photo right" class="px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] font-mono text-xs text-[#11161C]">→</button>
+            <button type="button" onclick="addEditorPhoto()" class="px-2.5 py-1 rounded-lg bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium">+ Add Photo</button>
+            <button type="button" id="img-ed-del-slide" onclick="removeEditorSlide()" class="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-medium">Remove</button>
+          </div>
+        </div>
+        <div id="img-ed-thumbs" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+      </div>
+
+      <!-- Live Framed Preview Box -->
+      <div id="img-ed-preview-box" class="rounded-xl overflow-hidden border border-[#DCE2E8] bg-[#E6ECF2] aspect-[4/3] flex items-center justify-center relative">
+        <img id="img-ed-preview" src="" alt="Preview" onerror="this.src='https://placehold.co/600x450/DCE2E8/4A5564?text=Preview'" class="w-full h-full transition-all duration-150" />
+      </div>
+
+      <!-- Framing & Cropping Controls -->
+      <div id="img-ed-framing-controls" class="p-3.5 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="font-mono text-xs font-medium text-[#11161C]">Framing Mode</span>
+          <div class="inline-flex rounded-lg bg-white p-0.5 border border-[#DCE2E8]">
+            <button type="button" id="btn-fit-cover" onclick="setEditorSlideFit('cover')" class="px-3 py-1 rounded-md text-xs font-medium transition">
+              Fill Frame (Cover)
+            </button>
+            <button type="button" id="btn-fit-contain" onclick="setEditorSlideFit('contain')" class="px-3 py-1 rounded-md text-xs font-medium transition">
+              Show Full Art (Contain)
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <div class="flex justify-between font-mono text-[11px] text-[#4A5564] mb-1">
+              <span>Position X</span>
+              <span id="val-pos-x">50%</span>
+            </div>
+            <input type="range" id="range-pos-x" min="0" max="100" value="50" oninput="updateEditorFraming()" class="w-full accent-[#2E5A78]" />
+          </div>
+          <div>
+            <div class="flex justify-between font-mono text-[11px] text-[#4A5564] mb-1">
+              <span>Position Y</span>
+              <span id="val-pos-y">50%</span>
+            </div>
+            <input type="range" id="range-pos-y" min="0" max="100" value="50" oninput="updateEditorFraming()" class="w-full accent-[#2E5A78]" />
+          </div>
+          <div>
+            <div class="flex justify-between font-mono text-[11px] text-[#4A5564] mb-1">
+              <span>Zoom</span>
+              <span id="val-zoom">100%</span>
+            </div>
+            <input type="range" id="range-zoom" min="100" max="200" value="100" oninput="updateEditorFraming()" class="w-full accent-[#2E5A78]" />
+          </div>
+        </div>
       </div>
 
       <!-- Local File Upload (Auto-resized & compressed to .webp) -->
       <div>
         <label class="block font-mono text-xs text-[#4A5564] mb-1.5">Option 1: Upload from Computer (Auto-optimized to .webp)</label>
-        <label class="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-[#2E5A78]/50 hover:border-[#2E5A78] rounded-xl bg-white cursor-pointer transition">
+        <label class="flex flex-col items-center justify-center w-full p-3.5 border-2 border-dashed border-[#2E5A78]/50 hover:border-[#2E5A78] rounded-xl bg-white cursor-pointer transition">
           <span class="text-xs font-medium text-[#2E5A78]">Choose image file (JPG, PNG, WEBP)</span>
           <span class="font-mono text-[11px] text-[#4A5564] mt-0.5">Max 1200px · Queued for GitHub /images/ folder</span>
           <input type="file" id="img-ed-file" accept="image/*" class="hidden" />
@@ -877,7 +1628,131 @@
           Cancel
         </button>
         <button type="button" onclick="applyImageChange()" class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-semibold">
-          Apply Image
+          Apply Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MOXFIELD POP-UP VIEWER MODAL (Selectable AP Catalog OR Visual Gallery)
+       ===================================================================== -->
+  <div id="moxfield-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Header -->
+      <div class="px-5 py-4 bg-[#FAFBFD] border-b border-[#DCE2E8] flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="mx-view-badge" class="px-2.5 py-0.5 rounded-full bg-[#2E5A78]/12 border border-[#2E5A78]/30 font-mono text-[11px] font-medium text-[#2E5A78]">
+              MOXFIELD AP CATALOG
+            </span>
+            <span id="mx-view-count" class="font-mono text-xs text-[#4A5564]"></span>
+          </div>
+          <h3 id="mx-view-title" class="font-display-lower font-semibold text-lg sm:text-xl text-[#11161C] mt-1">
+            Artist Proof Catalog
+          </h3>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a id="mx-external-link" href="https://moxfield.com" target="_blank" rel="noopener noreferrer"
+            class="px-3 py-2 rounded-xl bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C] transition">
+            Open in Moxfield ↗
+          </a>
+          <button type="button" onclick="closeMoxfieldModal()" class="p-2 rounded-xl hover:bg-[#F1F4F7] text-[#4A5564]" aria-label="Close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Foil Filter Bar -->
+      <div class="px-5 py-3 bg-[#F1F4F7] border-b border-[#DCE2E8] flex flex-wrap items-center justify-between gap-3">
+        <input type="text" id="mx-search-input" oninput="renderMoxfieldCards()" placeholder="Search card name..."
+          class="flex-1 min-w-[200px] px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs sm:text-sm text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+
+        <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-white px-3 py-2 rounded-xl border border-[#DCE2E8]">
+          <input type="checkbox" id="mx-foil-only" onchange="renderMoxfieldCards()" class="rounded text-[#1B5E48] focus:ring-0" />
+          <span class="font-mono text-xs font-medium text-[#11161C]">Foil Only (*F*)</span>
+        </label>
+      </div>
+
+      <!-- Cards Grid -->
+      <div id="mx-cards-grid" class="flex-1 overflow-y-auto p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VISUAL EDITOR: MOXFIELD POP-UP CONFIGURATOR MODAL
+       ===================================================================== -->
+  <div id="moxfield-editor-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="font-mono text-xs text-[#2E5A78]">MOXFIELD POP-UP INTEGRATION</span>
+          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Configure Moxfield Pop-up</h3>
+        </div>
+        <button type="button" onclick="closeMoxfieldEditor()" class="p-1.5 rounded-lg hover:bg-[#F1F4F7] text-[#4A5564]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <label class="flex items-center gap-2.5 p-3 rounded-xl bg-[#F1F4F7] border border-[#DCE2E8] cursor-pointer">
+        <input type="checkbox" id="mx-ed-enabled" class="w-4 h-4 accent-[#1B5E48]" />
+        <span class="text-xs sm:text-sm font-medium text-[#11161C]">Enable Moxfield Pop-up Button on this Card</span>
+      </label>
+
+      <!-- Mode Selector: Selectable Catalog vs Visual Card Gallery Only -->
+      <div>
+        <label class="block font-mono text-xs text-[#4A5564] mb-1.5">Pop-up Mode</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="flex items-start gap-2 p-3 rounded-xl bg-white border border-[#DCE2E8] cursor-pointer hover:border-[#2E5A78]">
+            <input type="radio" name="mx-ed-mode" value="catalog" class="mt-0.5 accent-[#1B5E48]" checked />
+            <div>
+              <span class="block text-xs font-semibold text-[#11161C]">AP Catalog (Selectable)</span>
+              <span class="block text-[11px] text-[#4A5564]">Includes "Select this AP" button to inquire directly.</span>
+            </div>
+          </label>
+          <label class="flex items-start gap-2 p-3 rounded-xl bg-white border border-[#DCE2E8] cursor-pointer hover:border-[#2E5A78]">
+            <input type="radio" name="mx-ed-mode" value="gallery" class="mt-0.5 accent-[#2E5A78]" />
+            <div>
+              <span class="block text-xs font-semibold text-[#11161C]">Visual Gallery Only</span>
+              <span class="block text-[11px] text-[#4A5564]">Displays card art showcase without selection buttons.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="mx-ed-label" class="block font-mono text-xs text-[#4A5564] mb-1">Button Label</label>
+          <input type="text" id="mx-ed-label" placeholder="Browse AP List (Pop-up)"
+            class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+        </div>
+        <div>
+          <label for="mx-ed-url" class="block font-mono text-xs text-[#4A5564] mb-1">Moxfield Deck URL (Optional)</label>
+          <input type="url" id="mx-ed-url" placeholder="https://moxfield.com/decks/..."
+            class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]" />
+        </div>
+      </div>
+
+      <div>
+        <label for="mx-ed-decktext" class="block font-mono text-xs text-[#4A5564] mb-1">
+          Moxfield Decklist Export (Paste from Moxfield → More → Export → Copy for Moxfield)
+        </label>
+        <textarea id="mx-ed-decktext" rows="6" placeholder="1 Bone Miser (C19) 15&#10;1 Syr Konrad, the Grim (ELD) 107 *F*&#10;1 Blood Artist"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#DCE2E8] font-mono text-xs text-[#11161C] focus:outline-none focus:border-[#2E5A78]"></textarea>
+        <p class="font-mono text-[11px] text-[#4A5564] mt-1">
+          Supports set codes, collector numbers, and <code class="bg-[#F1F4F7] px-1 rounded">*F*</code> foil tags. Card images load automatically via Scryfall.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button type="button" onclick="closeMoxfieldEditor()" class="px-4 py-2 rounded-xl border border-[#DCE2E8] text-xs font-medium text-[#4A5564]">
+          Cancel
+        </button>
+        <button type="button" onclick="saveMoxfieldEditor()" class="px-4 py-2 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-semibold">
+          Save Pop-up Settings
         </button>
       </div>
     </div>
@@ -886,7 +1761,7 @@
   <!-- =====================================================================
        CUSTOM CONFIRMATION & TOAST NOTIFICATION (Replaces browser alert/confirm)
        ===================================================================== -->
-  <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-[#11161C]/70 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+  <div id="confirm-modal" class="fixed inset-0 z-[70] hidden bg-[#11161C]/70 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
     <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
       <h4 id="confirm-title" class="font-display-lower font-semibold text-base text-[#11161C]">Confirm Removal</h4>
       <p id="confirm-message" class="text-xs sm:text-sm text-[#4A5564]">Are you sure you want to remove this item?</p>
@@ -897,7 +1772,7 @@
     </div>
   </div>
 
-  <div id="toast-banner" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-[#11161C] text-[#F8FAFC] border border-[#2E5A78] px-4 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5">
+  <div id="toast-banner" class="fixed bottom-5 right-5 z-[70] hidden max-w-sm bg-[#11161C] text-[#F8FAFC] border border-[#2E5A78] px-4 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5">
     <span id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
     <span id="toast-text">Notification</span>
   </div>
@@ -922,16 +1797,29 @@
     // Pending local .webp images queued for GitHub upload: { "images/slug-123.webp": { base64, previewUrl } }
     const pendingUploads = {};
 
+    // Per-card active slide index for multi-photo carousels: { [itemId]: number }
+    const cardSlideIndex = {};
+
     // Lightbox State
     let lightboxItems = [];
     let currentLightboxIndex = 0;
 
     // Image Editor Target State
-    let activeImageTarget = null; // { type: 'avatar'|'stock'|'commissions'|'portfolio', artistIdx, itemIdx }
-    let stagedUpload = null; // { path, base64, previewUrl }
+    let activeImageTarget = null; // { mode: 'avatar'|'item', artistIdx, collection, itemIdx }
+    let editorSlides = []; // Working copy of slides in Image Manager Modal
+    let editorActiveSlideIdx = 0;
+    let stagedUploadsInModal = {}; // { [slideIdx]: { path, base64, previewUrl } }
+
+    // Moxfield Pop-up Viewer & Editor State
+    let activeMoxfieldView = null; // { artistName, cardTitle, config, parsedCards }
+    let activeMoxfieldTarget = null; // { artistIdx, collection, itemIdx }
+    const scryfallCache = {}; // { [cacheKey]: { imageUrl, artist, setName } }
+
+    // Drag-and-Drop Reordering State
+    let dragState = null; // { type: 'artist'|'section'|'item', artistIdx, sectionKey, collection, itemIdx }
 
     // -----------------------------------------------------------------------
-    // Utility Helpers
+    // Utility Helpers & Rich Text Hyperlinks
     // -----------------------------------------------------------------------
     function slugify(str) {
       return (str || 'artwork')
@@ -951,10 +1839,70 @@
         .replace(/"/g, '&quot;');
     }
 
+    // Automatically converts [Label](https://...) and bare https://... URLs into safe clickable links
+    function formatRichText(rawText) {
+      const escaped = escapeHtml(rawText || '');
+      const mdLinks = [];
+      const withPlaceholders = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, url) => {
+        const token = `__MDLINK_${mdLinks.length}__`;
+        mdLinks.push(
+          `<a href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="text-[#2E5A78] underline decoration-[#2E5A78]/50 hover:text-[#1B5E48] break-words transition">${label}</a>`
+        );
+        return token;
+      });
+
+      const withBareLinks = withPlaceholders.replace(/(https?:\/\/[^\s<]+)/g, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="text-[#2E5A78] underline decoration-[#2E5A78]/50 hover:text-[#1B5E48] break-all transition">${url}</a>`;
+      });
+
+      return withBareLinks.replace(/__MDLINK_(\d+)__/g, (_, idx) => mdLinks[Number(idx)] || '');
+    }
+
     function resolveImageSrc(src) {
       if (!src) return 'https://placehold.co/600x450/DCE2E8/4A5564?text=No+Image';
       if (pendingUploads[src]) return pendingUploads[src].previewUrl;
       return src;
+    }
+
+    // Normalize item.images array (supports both { url } and { src } plus legacy item.image)
+    function getItemSlides(item) {
+      if (Array.isArray(item.images) && item.images.length > 0) {
+        return item.images.map((slide) => ({
+          url: slide.url || slide.src || item.image || '',
+          fit: slide.fit === 'contain' ? 'contain' : 'cover',
+          posX: Number.isFinite(Number(slide.posX)) ? Number(slide.posX) : 50,
+          posY: Number.isFinite(Number(slide.posY)) ? Number(slide.posY) : 50,
+          zoom: Number.isFinite(Number(slide.zoom)) ? Number(slide.zoom) : 100
+        }));
+      }
+      return [{
+        url: item.image || '',
+        fit: 'cover',
+        posX: 50,
+        posY: 50,
+        zoom: 100
+      }];
+    }
+
+    // Normalize item.moxfield / item.moxfieldPopup config
+    function getItemMoxfield(item) {
+      const raw = item.moxfield || item.moxfieldPopup;
+      if (!raw) return null;
+      return {
+        enabled: Boolean(raw.enabled),
+        mode: raw.mode === 'gallery' ? 'gallery' : 'catalog',
+        buttonLabel: raw.buttonLabel || (raw.mode === 'gallery' ? 'View Card Gallery (Pop-up)' : 'Browse AP List (Pop-up)'),
+        deckUrl: raw.deckUrl || raw.url || '',
+        deckList: raw.deckList || raw.deckText || ''
+      };
+    }
+
+    function getFrameStyle(slide) {
+      const fit = slide.fit === 'contain' ? 'contain' : 'cover';
+      const posX = slide.posX ?? 50;
+      const posY = slide.posY ?? 50;
+      const zoom = (slide.zoom ?? 100) / 100;
+      return `object-fit:${fit}; object-position:${posX}% ${posY}%; transform:scale(${zoom}); transform-origin:${posX}% ${posY}%;`;
     }
 
     function markDirty() {
@@ -1018,12 +1966,10 @@
       renderAll();
     }
 
-    // Check URL parameter ?edit on load
     if (new URLSearchParams(window.location.search).has('edit')) {
       window.addEventListener('DOMContentLoaded', () => setEditMode(true));
     }
 
-    // Keyboard shortcut Ctrl+Shift+E or Cmd+Shift+E
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
         e.preventDefault();
@@ -1040,7 +1986,23 @@
     });
 
     // -----------------------------------------------------------------------
-    // Rendering Engine (Hero, Filters, Artists, Lightbox Collection)
+    // Multi-Photo Carousel Controls per Card
+    // -----------------------------------------------------------------------
+    function stepCardSlide(event, itemId, delta, total) {
+      event.stopPropagation();
+      const cur = cardSlideIndex[itemId] || 0;
+      cardSlideIndex[itemId] = (cur + delta + total) % total;
+      renderArtists();
+    }
+
+    function goToCardSlide(event, itemId, index) {
+      event.stopPropagation();
+      cardSlideIndex[itemId] = index;
+      renderArtists();
+    }
+
+    // -----------------------------------------------------------------------
+    // Rendering Engine (Hero, Filters, Artists, Dynamic Sections & Cards)
     // -----------------------------------------------------------------------
     function renderHero() {
       const brandHeader = document.getElementById('brand-title-header');
@@ -1121,7 +2083,7 @@
 
     function renderStatusPill(status) {
       if (status === 'Available') {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1B5E48]/12 text-[#1B5E48] border border-[#1B5E48]/30 font-mono text-[11px] font-medium">
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1B5E48]/12 text-[#1B5E48] border border-[#1B5E48]/30 font-mono text-[11px] font-medium backdrop-blur-xs">
           <span class="w-1.5 h-1.5 rounded-full bg-[#1B5E48]"></span>Available
         </span>`;
       }
@@ -1135,9 +2097,81 @@
       </span>`;
     }
 
+    function renderCardMedia(item, artistIdx, collection, itemIdx, aspectClass, lbStartIndex, slides) {
+      const activeIdx = Math.min(cardSlideIndex[item.id] || 0, slides.length - 1);
+      const currentSlide = slides[activeIdx];
+      const bgTone = currentSlide.fit === 'contain' ? 'bg-[#E6ECF2]' : 'bg-[#DCE2E8]/40';
+      const clickAction = isEditMode
+        ? `openImageEditorModal('item', ${artistIdx}, '${collection}', ${itemIdx})`
+        : `openLightbox(${lbStartIndex + activeIdx})`;
+
+      const multiControls = slides.length > 1 ? `
+        <button type="button" onclick="stepCardSlide(event, '${escapeHtml(item.id)}', -1, ${slides.length})"
+          class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-[#0B0E12]/65 hover:bg-[#0B0E12]/85 text-white text-xs flex items-center justify-center transition" aria-label="Previous photo">
+          ‹
+        </button>
+        <button type="button" onclick="stepCardSlide(event, '${escapeHtml(item.id)}', 1, ${slides.length})"
+          class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-[#0B0E12]/65 hover:bg-[#0B0E12]/85 text-white text-xs flex items-center justify-center transition" aria-label="Next photo">
+          ›
+        </button>
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#0B0E12]/55 backdrop-blur-xs">
+          ${slides.map((_, sIdx) => `
+            <button type="button" onclick="goToCardSlide(event, '${escapeHtml(item.id)}', ${sIdx})"
+              class="w-1.5 h-1.5 rounded-full transition ${sIdx === activeIdx ? 'bg-white scale-125' : 'bg-white/45 hover:bg-white/80'}"
+              aria-label="Photo ${sIdx + 1}"></button>
+          `).join('')}
+        </div>
+      ` : '';
+
+      return `
+        <div onclick="${clickAction}"
+          class="editable-image-wrap relative ${aspectClass} ${bgTone} overflow-hidden cursor-zoom-in">
+          <img src="${escapeHtml(resolveImageSrc(currentSlide.url))}" alt="${escapeHtml(item.title)}"
+            style="${getFrameStyle(currentSlide)}"
+            onerror="this.src='https://placehold.co/600x450/DCE2E8/4A5564?text=Artwork+Preview'"
+            class="w-full h-full transition duration-300" />
+          ${multiControls}
+        </div>
+      `;
+    }
+
+    function renderMoxfieldTrigger(artist, artistIdx, collection, item, itemIdx) {
+      const mx = getItemMoxfield(item);
+      const isEnabled = Boolean(mx && mx.enabled);
+      const label = (mx && mx.buttonLabel) || (mx && mx.mode === 'gallery' ? 'View Card Gallery (Pop-up)' : 'Browse AP List (Pop-up)');
+
+      let html = '';
+      if (isEnabled) {
+        html += `
+          <div class="mt-3">
+            <button type="button" onclick="openMoxfieldModal(${artistIdx}, '${collection}', ${itemIdx})"
+              class="w-full px-3 py-2 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition flex items-center justify-center gap-2 shadow-xs">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span>${escapeHtml(label)}</span>
+            </button>
+          </div>
+        `;
+      }
+
+      if (isEditMode) {
+        html += `
+          <div class="mt-2">
+            <button type="button" onclick="openMoxfieldEditor(${artistIdx}, '${collection}', ${itemIdx})"
+              class="w-full px-2.5 py-1.5 rounded-lg border border-dashed border-[#2E5A78] bg-white hover:bg-[#2E5A78]/5 font-mono text-[11px] font-medium text-[#2E5A78] transition">
+              ${isEnabled ? '✎ Edit Moxfield Pop-up' : '+ Moxfield Pop-up'}
+            </button>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
     function renderArtists() {
       const container = document.getElementById('artists-container');
-      lightboxItems = []; // Rebuild lightbox gallery index
+      lightboxItems = [];
 
       const filtered = getFilteredArtists();
       if (filtered.length === 0) {
@@ -1152,189 +2186,312 @@
 
       container.innerHTML = filtered.map((artist) => {
         const artistIdx = siteData.artists.findIndex((a) => a.id === artist.id);
-        const visibleStock = (artist.stock || []).filter((item) => {
-          if (inStockOnly && !isEditMode) return item.status === 'Available';
-          return true;
-        });
+        const order = Array.isArray(artist.sectionOrder) && artist.sectionOrder.length === 3
+          ? artist.sectionOrder
+          : ['stock', 'commissions', 'portfolio'];
 
-        // Register Lightbox Items for this artist
-        const stockCardsHtml = visibleStock.map((item) => {
-          const itemIdx = artist.stock.findIndex((s) => s.id === item.id);
-          const lbIndex = lightboxItems.push({
-            image: resolveImageSrc(item.image),
-            artistName: artist.name,
-            category: 'FIRST COME, FIRST SERVE · STOCK',
-            title: item.title,
-            details: item.details,
-            price: item.price,
-            status: item.status
-          }) - 1;
+        const sectionsHtml = order.map((secKey) => {
+          if (secKey === 'stock') {
+            const visibleStock = (artist.stock || []).filter((item) => {
+              if (inStockOnly && !isEditMode) return item.status === 'Available';
+              return true;
+            });
 
-          const isSold = item.status === 'Sold';
-          const isReserved = item.status === 'Reserved';
+            const stockCardsHtml = visibleStock.map((item) => {
+              const itemIdx = artist.stock.findIndex((s) => s.id === item.id);
+              const slides = getItemSlides(item);
+              const lbStartIndex = lightboxItems.length;
+              slides.forEach((sl) => {
+                lightboxItems.push({
+                  image: resolveImageSrc(sl.url),
+                  artistName: artist.name,
+                  category: 'FIRST COME, FIRST SERVE · STOCK',
+                  title: item.title,
+                  details: item.details,
+                  price: item.price,
+                  status: item.status
+                });
+              });
 
-          return `
-            <article class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
-              ${isEditMode ? `
-                <button type="button" onclick="deleteArtistItem(${artistIdx}, 'stock', ${itemIdx})" title="Delete piece"
-                  class="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
-                  &times;
-                </button>` : ''}
+              const isSold = item.status === 'Sold';
+              const isReserved = item.status === 'Reserved';
 
-              <div>
-                <div onclick="${isEditMode ? `openImageEditorModal('avatar_or_item', ${artistIdx}, 'stock', ${itemIdx})` : `openLightbox(${lbIndex})`}"
-                  class="editable-image-wrap relative aspect-[4/3] bg-[#DCE2E8]/40 overflow-hidden cursor-zoom-in">
-                  <img src="${escapeHtml(resolveImageSrc(item.image))}" alt="${escapeHtml(item.title)}"
-                    onerror="this.src='https://placehold.co/600x450/DCE2E8/4A5564?text=Artist+Proof'"
-                    class="w-full h-full object-cover transition duration-500 group-hover:scale-103" />
-                  <div class="absolute top-2.5 left-2.5">
-                    ${renderStatusPill(item.status)}
-                  </div>
-                </div>
-
-                <div class="p-4">
-                  <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'title', this.textContent)"` : ''}
-                    class="font-semibold text-sm sm:text-base text-[#11161C] leading-snug mb-1">
-                    ${escapeHtml(item.title)}
-                  </h4>
-                  <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'details', this.textContent)"` : ''}
-                    class="text-xs text-[#4A5564] leading-relaxed">
-                    ${escapeHtml(item.details)}
-                  </p>
-
+              return `
+                <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="stock" data-item-idx="${itemIdx}"
+                  class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
                   ${isEditMode ? `
-                    <div class="mt-3 pt-2.5 border-t border-[#DCE2E8] flex items-center gap-1">
-                      ${['Available', 'Reserved', 'Sold'].map((st) => `
-                        <button type="button" onclick="setStockStatus(${artistIdx}, ${itemIdx}, '${st}')"
-                          class="flex-1 py-1 rounded-md font-mono text-[10px] font-medium border transition ${
-                            item.status === st
-                              ? 'bg-[#11161C] text-white border-[#11161C]'
-                              : 'bg-white text-[#4A5564] border-[#DCE2E8] hover:border-[#11161C]'
-                          }">
-                          ${st}
-                        </button>
-                      `).join('')}
+                    <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                      <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                        data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="stock" data-item-idx="${itemIdx}" title="Drag to reorder card">
+                        ⋮⋮
+                      </button>
+                      <button type="button" onclick="deleteArtistItem(${artistIdx}, 'stock', ${itemIdx})" title="Delete piece"
+                        class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                        &times;
+                      </button>
+                    </div>` : ''}
+
+                  <div>
+                    <div class="relative">
+                      ${renderCardMedia(item, artistIdx, 'stock', itemIdx, 'aspect-[4/3]', lbStartIndex, slides)}
+                      <div class="absolute top-2.5 left-2.5 pointer-events-none">
+                        ${renderStatusPill(item.status)}
+                      </div>
                     </div>
-                  ` : ''}
+
+                    <div class="p-4">
+                      <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'title', this.textContent)"` : ''}
+                        class="font-semibold text-sm sm:text-base text-[#11161C] leading-snug mb-1">
+                        ${escapeHtml(item.title)}
+                      </h4>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'details', this.textContent)"` : ''}
+                        class="text-xs text-[#4A5564] leading-relaxed">
+                        ${isEditMode ? escapeHtml(item.details) : formatRichText(item.details)}
+                      </p>
+
+                      ${renderMoxfieldTrigger(artist, artistIdx, 'stock', item, itemIdx)}
+
+                      ${isEditMode ? `
+                        <div class="mt-3 pt-2.5 border-t border-[#DCE2E8] flex items-center gap-1">
+                          ${['Available', 'Reserved', 'Sold'].map((st) => `
+                            <button type="button" onclick="setStockStatus(${artistIdx}, ${itemIdx}, '${st}')"
+                              class="flex-1 py-1 rounded-md font-mono text-[10px] font-medium border transition ${
+                                item.status === st
+                                  ? 'bg-[#11161C] text-white border-[#11161C]'
+                                  : 'bg-white text-[#4A5564] border-[#DCE2E8] hover:border-[#11161C]'
+                              }">
+                              ${st}
+                            </button>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+
+                  <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
+                    <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'price', this.textContent)"` : ''}
+                      class="font-mono text-sm font-medium text-[#11161C]">
+                      ${escapeHtml(item.price)}
+                    </span>
+
+                    ${isSold
+                      ? `<button type="button" disabled class="px-3.5 py-2 rounded-xl bg-[#E2E8F0] text-[#475569] text-xs font-medium cursor-not-allowed">Sold</button>`
+                      : `<button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: '${escapeHtml(item.title + ' (' + item.price + ')').replace(/'/g, "\\'")}' })"
+                          class="px-3.5 py-2 rounded-xl text-xs font-medium transition ${
+                            isReserved
+                              ? 'bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#B45309] border border-[#F59E0B]/40'
+                              : 'bg-[#1B5E48] hover:bg-[#144737] text-white shadow-xs'
+                          }">
+                          ${isReserved ? 'Inquire Backup' : 'Claim / Inquire'}
+                        </button>`
+                    }
+                  </div>
+                </article>
+              `;
+            }).join('');
+
+            return `
+              <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="stock" class="space-y-4 rounded-xl transition">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-start gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                        data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="stock" title="Drag to reorder section">
+                        ⋮⋮
+                      </button>` : ''}
+                    <div>
+                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        First Come, First Serve — Artist Proofs &amp; Originals
+                      </h3>
+                      <p class="font-mono text-xs text-[#4A5564]">Direct studio allocation · Worldwide tracked shipping</p>
+                    </div>
+                  </div>
+                  ${isEditMode ? `
+                    <button type="button" onclick="addArtistItem(${artistIdx}, 'stock')"
+                      class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                      + Add Stock Piece
+                    </button>` : ''}
                 </div>
-              </div>
 
-              <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
-                <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'price', this.textContent)"` : ''}
-                  class="font-mono text-sm font-medium text-[#11161C]">
-                  ${escapeHtml(item.price)}
-                </span>
-
-                ${isSold
-                  ? `<button type="button" disabled class="px-3.5 py-2 rounded-xl bg-[#E2E8F0] text-[#475569] text-xs font-medium cursor-not-allowed">Sold</button>`
-                  : `<button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: '${escapeHtml(item.title + ' (' + item.price + ')').replace(/'/g, "\\'")}' })"
-                      class="px-3.5 py-2 rounded-xl text-xs font-medium transition ${
-                        isReserved
-                          ? 'bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#B45309] border border-[#F59E0B]/40'
-                          : 'bg-[#1B5E48] hover:bg-[#144737] text-white shadow-xs'
-                      }">
-                      ${isReserved ? 'Inquire Backup' : 'Claim / Inquire'}
-                    </button>`
+                ${visibleStock.length > 0
+                  ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">${stockCardsHtml}</div>`
+                  : `<p class="text-xs font-mono text-[#4A5564] bg-[#F1F4F7] p-4 rounded-xl border border-[#DCE2E8]">No items listed in this stock view.</p>`
                 }
               </div>
-            </article>
-          `;
-        }).join('');
+            `;
+          }
 
-        const commissionCardsHtml = (artist.commissions || []).map((comm, commIdx) => {
-          const lbIndex = lightboxItems.push({
-            image: resolveImageSrc(comm.image),
-            artistName: artist.name,
-            category: 'COMMISSION MENU & EXAMPLE',
-            title: comm.title,
-            details: comm.details,
-            price: comm.price
-          }) - 1;
+          if (secKey === 'commissions') {
+            const commissionCardsHtml = (artist.commissions || []).map((comm, commIdx) => {
+              const slides = getItemSlides(comm);
+              const lbStartIndex = lightboxItems.length;
+              slides.forEach((sl) => {
+                lightboxItems.push({
+                  image: resolveImageSrc(sl.url),
+                  artistName: artist.name,
+                  category: 'COMMISSION MENU & EXAMPLE',
+                  title: comm.title,
+                  details: comm.details,
+                  price: comm.price
+                });
+              });
+
+              return `
+                <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="commissions" data-item-idx="${commIdx}"
+                  class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
+                  ${isEditMode ? `
+                    <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                      <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                        data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="commissions" data-item-idx="${commIdx}" title="Drag to reorder card">
+                        ⋮⋮
+                      </button>
+                      <button type="button" onclick="deleteArtistItem(${artistIdx}, 'commissions', ${commIdx})" title="Delete commission tier"
+                        class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                        &times;
+                      </button>
+                    </div>` : ''}
+
+                  <div>
+                    ${renderCardMedia(comm, artistIdx, 'commissions', commIdx, 'aspect-[16/10]', lbStartIndex, slides)}
+                    <div class="p-4">
+                      <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'title', this.textContent)"` : ''}
+                        class="font-semibold text-sm sm:text-base text-[#11161C] mb-1">
+                        ${escapeHtml(comm.title)}
+                      </h4>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'details', this.textContent)"` : ''}
+                        class="text-xs text-[#4A5564] leading-relaxed">
+                        ${isEditMode ? escapeHtml(comm.details) : formatRichText(comm.details)}
+                      </p>
+
+                      ${renderMoxfieldTrigger(artist, artistIdx, 'commissions', comm, commIdx)}
+                    </div>
+                  </div>
+
+                  <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
+                    <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'price', this.textContent)"` : ''}
+                      class="font-mono text-xs sm:text-sm font-medium text-[#2E5A78]">
+                      ${escapeHtml(comm.price)}
+                    </span>
+                    <button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: 'Commission: ${escapeHtml(comm.title).replace(/'/g, "\\'")}' })"
+                      class="px-3.5 py-2 rounded-xl bg-[#FAFBFD] hover:bg-[#2E5A78] text-[#11161C] hover:text-white border border-[#DCE2E8] hover:border-[#2E5A78] text-xs font-medium transition">
+                      Inquire
+                    </button>
+                  </div>
+                </article>
+              `;
+            }).join('');
+
+            return `
+              <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="commissions" class="space-y-4 pt-2 rounded-xl transition">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-start gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                        data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="commissions" title="Drag to reorder section">
+                        ⋮⋮
+                      </button>` : ''}
+                    <div>
+                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        Commission Menu &amp; Examples
+                      </h3>
+                      <p class="font-mono text-xs text-[#4A5564]">Signatures, custom ink sketches &amp; full acrylic back paintings</p>
+                    </div>
+                  </div>
+                  ${isEditMode ? `
+                    <button type="button" onclick="addArtistItem(${artistIdx}, 'commissions')"
+                      class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                      + Add Commission
+                    </button>` : ''}
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  ${commissionCardsHtml}
+                </div>
+              </div>
+            `;
+          }
+
+          // Portfolio Section
+          const portfolioCardsHtml = (artist.portfolio || []).map((work, workIdx) => {
+            const slides = getItemSlides(work);
+            const lbStartIndex = lightboxItems.length;
+            slides.forEach((sl) => {
+              lightboxItems.push({
+                image: resolveImageSrc(sl.url),
+                artistName: artist.name,
+                category: 'SELECTED CARD WORKS · PORTFOLIO',
+                title: work.title,
+                details: work.details,
+                price: ''
+              });
+            });
+
+            return `
+              <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="portfolio" data-item-idx="${workIdx}"
+                class="group relative bg-[#F1F4F7]/50 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between">
+                ${isEditMode ? `
+                  <div class="absolute top-2 right-2 z-20 flex items-center gap-1">
+                    <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                      data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="portfolio" data-item-idx="${workIdx}" title="Drag to reorder card">
+                      ⋮⋮
+                    </button>
+                    <button type="button" onclick="deleteArtistItem(${artistIdx}, 'portfolio', ${workIdx})" title="Delete portfolio item"
+                      class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                      &times;
+                    </button>
+                  </div>` : ''}
+
+                <div>
+                  ${renderCardMedia(work, artistIdx, 'portfolio', workIdx, 'aspect-[4/3]', lbStartIndex, slides)}
+                  <div class="p-3">
+                    <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'title', this.textContent)"` : ''}
+                      class="font-medium text-xs sm:text-sm text-[#11161C] truncate">
+                      ${escapeHtml(work.title)}
+                    </h4>
+                    <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'details', this.textContent)"` : ''}
+                      class="font-mono text-[11px] text-[#4A5564] mt-0.5 leading-relaxed">
+                      ${isEditMode ? escapeHtml(work.details) : formatRichText(work.details)}
+                    </p>
+                    ${renderMoxfieldTrigger(artist, artistIdx, 'portfolio', work, workIdx)}
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('');
 
           return `
-            <article class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
-              ${isEditMode ? `
-                <button type="button" onclick="deleteArtistItem(${artistIdx}, 'commissions', ${commIdx})" title="Delete commission tier"
-                  class="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
-                  &times;
-                </button>` : ''}
-
-              <div>
-                <div onclick="${isEditMode ? `openImageEditorModal('avatar_or_item', ${artistIdx}, 'commissions', ${commIdx})` : `openLightbox(${lbIndex})`}"
-                  class="editable-image-wrap relative aspect-[16/10] bg-[#DCE2E8]/40 overflow-hidden cursor-zoom-in">
-                  <img src="${escapeHtml(resolveImageSrc(comm.image))}" alt="${escapeHtml(comm.title)}"
-                    onerror="this.src='https://placehold.co/600x375/DCE2E8/4A5564?text=Commission+Sample'"
-                    class="w-full h-full object-cover transition duration-500 group-hover:scale-103" />
+            <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="portfolio" class="space-y-4 pt-2 rounded-xl transition">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-start gap-2.5">
+                  ${isEditMode ? `
+                    <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                      data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="portfolio" title="Drag to reorder section">
+                      ⋮⋮
+                    </button>` : ''}
+                  <div>
+                    <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                      Selected Card Works
+                    </h3>
+                    <p class="font-mono text-xs text-[#4A5564]">Published illustrations &amp; archive</p>
+                  </div>
                 </div>
-                <div class="p-4">
-                  <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'title', this.textContent)"` : ''}
-                    class="font-semibold text-sm sm:text-base text-[#11161C] mb-1">
-                    ${escapeHtml(comm.title)}
-                  </h4>
-                  <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'details', this.textContent)"` : ''}
-                    class="text-xs text-[#4A5564] leading-relaxed">
-                    ${escapeHtml(comm.details)}
-                  </p>
-                </div>
+                ${isEditMode ? `
+                  <button type="button" onclick="addArtistItem(${artistIdx}, 'portfolio')"
+                    class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                    + Add Portfolio Work
+                  </button>` : ''}
               </div>
 
-              <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
-                <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'price', this.textContent)"` : ''}
-                  class="font-mono text-xs sm:text-sm font-medium text-[#2E5A78]">
-                  ${escapeHtml(comm.price)}
-                </span>
-                <button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: 'Commission: ${escapeHtml(comm.title).replace(/'/g, "\\'")}' })"
-                  class="px-3.5 py-2 rounded-xl bg-[#FAFBFD] hover:bg-[#2E5A78] text-[#11161C] hover:text-white border border-[#DCE2E8] hover:border-[#2E5A78] text-xs font-medium transition">
-                  Inquire
-                </button>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                ${portfolioCardsHtml}
               </div>
-            </article>
-          `;
-        }).join('');
-
-        const portfolioCardsHtml = (artist.portfolio || []).map((work, workIdx) => {
-          const lbIndex = lightboxItems.push({
-            image: resolveImageSrc(work.image),
-            artistName: artist.name,
-            category: 'SELECTED CARD WORKS · PORTFOLIO',
-            title: work.title,
-            details: work.details,
-            price: ''
-          }) - 1;
-
-          return `
-            <article class="group relative bg-[#F1F4F7]/50 border border-[#DCE2E8] rounded-xl overflow-hidden">
-              ${isEditMode ? `
-                <button type="button" onclick="deleteArtistItem(${artistIdx}, 'portfolio', ${workIdx})" title="Delete portfolio item"
-                  class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
-                  &times;
-                </button>` : ''}
-
-              <div onclick="${isEditMode ? `openImageEditorModal('avatar_or_item', ${artistIdx}, 'portfolio', ${workIdx})` : `openLightbox(${lbIndex})`}"
-                class="editable-image-wrap relative aspect-[4/3] bg-[#DCE2E8]/40 overflow-hidden cursor-zoom-in">
-                <img src="${escapeHtml(resolveImageSrc(work.image))}" alt="${escapeHtml(work.title)}"
-                  onerror="this.src='https://placehold.co/600x450/DCE2E8/4A5564?text=Selected+Work'"
-                  class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
-                <div class="absolute bottom-2.5 right-2.5 p-1.5 rounded-lg bg-[#0B0E12]/70 text-white opacity-0 group-hover:opacity-100 transition pointer-events-none">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0zM11 8v6m-3-3h6"/></svg>
-                </div>
-              </div>
-              <div class="p-3">
-                <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'title', this.textContent)"` : ''}
-                  class="font-medium text-xs sm:text-sm text-[#11161C] truncate">
-                  ${escapeHtml(work.title)}
-                </h4>
-                <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'details', this.textContent)"` : ''}
-                  class="font-mono text-[11px] text-[#4A5564] truncate mt-0.5">
-                  ${escapeHtml(work.details)}
-                </p>
-              </div>
-            </article>
+            </div>
           `;
         }).join('');
 
         return `
-          <section id="artist-${escapeHtml(artist.id)}" class="scroll-mt-36 bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl p-5 sm:p-8 shadow-xs space-y-8">
+          <section id="artist-${escapeHtml(artist.id)}" data-drag-unit="artist" data-artist-idx="${artistIdx}"
+            class="scroll-mt-36 bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl p-5 sm:p-8 shadow-xs space-y-8 transition">
             <!-- Artist Header -->
             <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-[#DCE2E8]">
               <div class="flex flex-col sm:flex-row items-start gap-5">
@@ -1347,6 +2504,11 @@
 
                 <div class="space-y-1.5 max-w-2xl">
                   <div class="flex flex-wrap items-center gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle px-2.5 py-1 rounded-lg bg-[#11161C] text-white font-mono text-xs shadow-xs"
+                        data-handle-type="artist" data-artist-idx="${artistIdx}" title="Drag to reorder artist">
+                        ⋮⋮ Move Artist
+                      </button>` : ''}
                     <h2 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'name', this.textContent)"` : ''}
                       class="font-display-lower font-semibold text-2xl sm:text-3xl text-[#11161C]">
                       ${escapeHtml(artist.name)}
@@ -1365,7 +2527,7 @@
 
                   <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'bio', this.textContent)"` : ''}
                     class="text-sm text-[#4A5564] leading-relaxed pt-1">
-                    ${escapeHtml(artist.bio)}
+                    ${isEditMode ? escapeHtml(artist.bio) : formatRichText(artist.bio)}
                   </p>
                 </div>
               </div>
@@ -1383,69 +2545,7 @@
               </div>
             </div>
 
-            <!-- Section 1: First Come, First Serve Stock -->
-            <div class="space-y-4">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                    First Come, First Serve — Artist Proofs &amp; Originals
-                  </h3>
-                  <p class="font-mono text-xs text-[#4A5564]">Direct studio allocation · Worldwide tracked shipping</p>
-                </div>
-                ${isEditMode ? `
-                  <button type="button" onclick="addArtistItem(${artistIdx}, 'stock')"
-                    class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
-                    + Add Stock Piece
-                  </button>` : ''}
-              </div>
-
-              ${visibleStock.length > 0
-                ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">${stockCardsHtml}</div>`
-                : `<p class="text-xs font-mono text-[#4A5564] bg-[#F1F4F7] p-4 rounded-xl border border-[#DCE2E8]">No items listed in this stock view.</p>`
-              }
-            </div>
-
-            <!-- Section 2: Commission Menu & Examples -->
-            <div class="space-y-4 pt-2">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                    Commission Menu &amp; Examples
-                  </h3>
-                  <p class="font-mono text-xs text-[#4A5564]">Signatures, custom ink sketches &amp; full acrylic back paintings</p>
-                </div>
-                ${isEditMode ? `
-                  <button type="button" onclick="addArtistItem(${artistIdx}, 'commissions')"
-                    class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
-                    + Add Commission
-                  </button>` : ''}
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                ${commissionCardsHtml}
-              </div>
-            </div>
-
-            <!-- Section 3: Selected Card Works / Portfolio -->
-            <div class="space-y-4 pt-2">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                    Selected Card Works
-                  </h3>
-                  <p class="font-mono text-xs text-[#4A5564]">Published illustrations &amp; archive</p>
-                </div>
-                ${isEditMode ? `
-                  <button type="button" onclick="addArtistItem(${artistIdx}, 'portfolio')"
-                    class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
-                    + Add Portfolio Work
-                  </button>` : ''}
-              </div>
-
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                ${portfolioCardsHtml}
-              </div>
-            </div>
+            ${sectionsHtml}
           </section>
         `;
       }).join('');
@@ -1463,6 +2563,136 @@
       renderFilters();
       renderArtists();
     }
+
+    // -----------------------------------------------------------------------
+    // Drag-and-Drop ("Drag and Release") Reordering in Visual Edit Mode
+    // -----------------------------------------------------------------------
+    (function initDragAndDrop() {
+      const root = document.getElementById('artists-container');
+
+      function clearDragVisuals() {
+        root.querySelectorAll('[draggable="true"]').forEach((el) => el.removeAttribute('draggable'));
+        root.querySelectorAll('.is-dragging').forEach((el) => el.classList.remove('is-dragging'));
+        root.querySelectorAll('.drag-over-target').forEach((el) => el.classList.remove('drag-over-target'));
+      }
+
+      root.addEventListener('pointerdown', (e) => {
+        if (!isEditMode) return;
+        const handle = e.target.closest('.drag-handle');
+        if (!handle) return;
+        const unit = handle.closest('[data-drag-unit]');
+        if (unit) unit.setAttribute('draggable', 'true');
+      });
+
+      root.addEventListener('pointerup', () => {
+        if (!dragState) clearDragVisuals();
+      });
+
+      root.addEventListener('dragstart', (e) => {
+        if (!isEditMode) return;
+        const unit = e.target.closest('[data-drag-unit][draggable="true"]');
+        if (!unit) return;
+        e.stopPropagation();
+
+        const type = unit.dataset.dragUnit;
+        dragState = {
+          type,
+          artistIdx: Number(unit.dataset.artistIdx),
+          sectionKey: unit.dataset.sectionKey || null,
+          collection: unit.dataset.collection || null,
+          itemIdx: unit.dataset.itemIdx !== undefined ? Number(unit.dataset.itemIdx) : null
+        };
+
+        unit.classList.add('is-dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', type);
+        }
+      });
+
+      root.addEventListener('dragover', (e) => {
+        if (!isEditMode || !dragState) return;
+        const target = e.target.closest(`[data-drag-unit="${dragState.type}"]`);
+        if (!target) return;
+
+        if (dragState.type === 'section') {
+          if (Number(target.dataset.artistIdx) !== dragState.artistIdx) return;
+          if (target.dataset.sectionKey === dragState.sectionKey) return;
+        } else if (dragState.type === 'item') {
+          if (Number(target.dataset.artistIdx) !== dragState.artistIdx) return;
+          if (target.dataset.collection !== dragState.collection) return;
+          if (Number(target.dataset.itemIdx) === dragState.itemIdx) return;
+        } else if (dragState.type === 'artist') {
+          if (Number(target.dataset.artistIdx) === dragState.artistIdx) return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+
+        root.querySelectorAll('.drag-over-target').forEach((el) => {
+          if (el !== target) el.classList.remove('drag-over-target');
+        });
+        target.classList.add('drag-over-target');
+      });
+
+      root.addEventListener('drop', (e) => {
+        if (!isEditMode || !dragState) return;
+        const target = e.target.closest(`[data-drag-unit="${dragState.type}"]`);
+        if (!target) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (dragState.type === 'artist') {
+          const fromIdx = dragState.artistIdx;
+          const toIdx = Number(target.dataset.artistIdx);
+          if (fromIdx !== toIdx && fromIdx >= 0 && toIdx >= 0) {
+            const [moved] = siteData.artists.splice(fromIdx, 1);
+            siteData.artists.splice(toIdx, 0, moved);
+            markDirty();
+            showToast('Artist order updated');
+          }
+        } else if (dragState.type === 'section') {
+          const artist = siteData.artists[dragState.artistIdx];
+          if (artist && Number(target.dataset.artistIdx) === dragState.artistIdx) {
+            if (!Array.isArray(artist.sectionOrder) || artist.sectionOrder.length !== 3) {
+              artist.sectionOrder = ['stock', 'commissions', 'portfolio'];
+            }
+            const fromIdx = artist.sectionOrder.indexOf(dragState.sectionKey);
+            const toIdx = artist.sectionOrder.indexOf(target.dataset.sectionKey);
+            if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+              const [movedSec] = artist.sectionOrder.splice(fromIdx, 1);
+              artist.sectionOrder.splice(toIdx, 0, movedSec);
+              markDirty();
+              showToast('Section order updated');
+            }
+          }
+        } else if (dragState.type === 'item') {
+          const artist = siteData.artists[dragState.artistIdx];
+          if (artist && Number(target.dataset.artistIdx) === dragState.artistIdx && target.dataset.collection === dragState.collection) {
+            const list = artist[dragState.collection];
+            const fromIdx = dragState.itemIdx;
+            const toIdx = Number(target.dataset.itemIdx);
+            if (Array.isArray(list) && fromIdx !== toIdx && fromIdx >= 0 && toIdx >= 0) {
+              const [movedItem] = list.splice(fromIdx, 1);
+              list.splice(toIdx, 0, movedItem);
+              markDirty();
+              showToast('Card order updated');
+            }
+          }
+        }
+
+        dragState = null;
+        clearDragVisuals();
+        renderAll();
+      });
+
+      root.addEventListener('dragend', () => {
+        dragState = null;
+        clearDragVisuals();
+      });
+    })();
 
     // -----------------------------------------------------------------------
     // Darkroom Lightbox Logic
@@ -1526,6 +2756,8 @@
         closeInquiryModal();
         closeImageEditorModal();
         closeGhTokenModal();
+        closeMoxfieldModal();
+        closeMoxfieldEditor();
       }
     });
 
@@ -1593,6 +2825,248 @@
     });
 
     // -----------------------------------------------------------------------
+    // Moxfield Pop-up Viewer & Visual Editor Logic
+    // -----------------------------------------------------------------------
+    function parseMoxfieldDecklist(deckText) {
+      const lines = String(deckText || '').split(/\r?\n/);
+      const parsed = [];
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('//') || line.startsWith('#') || /^(deck|sideboard|commander|maybeboard)$/i.test(line)) {
+          continue;
+        }
+        const isFoil = /\*f\*/i.test(line);
+        let clean = line.replace(/\*f\*/gi, '').replace(/\*e\*/gi, '').trim();
+        clean = clean.replace(/^\d+x?\s+/i, '');
+
+        let setCode = '';
+        let collectorNum = '';
+        const setMatch = clean.match(/\(([a-z0-9]{2,6})\)\s*([a-z0-9-]+)?\s*$/i);
+        if (setMatch) {
+          setCode = setMatch[1].toLowerCase();
+          collectorNum = setMatch[2] || '';
+          clean = clean.slice(0, setMatch.index).trim();
+        }
+
+        if (clean) {
+          parsed.push({
+            name: clean,
+            set: setCode,
+            collectorNumber: collectorNum,
+            foil: isFoil
+          });
+        }
+      }
+      return parsed;
+    }
+
+    function getScryfallFallbackUrl(card) {
+      if (card.set && card.collectorNumber) {
+        return `https://api.scryfall.com/cards/${encodeURIComponent(card.set)}/${encodeURIComponent(card.collectorNumber)}?format=image&version=normal`;
+      }
+      return `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.name)}&format=image&version=normal`;
+    }
+
+    async function hydrateScryfallImages(cards) {
+      const uncached = cards.filter((c) => {
+        const key = `${c.name}|${c.set}|${c.collectorNumber}`;
+        return !scryfallCache[key];
+      });
+      if (uncached.length === 0) return;
+
+      for (let i = 0; i < uncached.length; i += 75) {
+        const batch = uncached.slice(i, i + 75);
+        const identifiers = batch.map((c) => {
+          if (c.set && c.collectorNumber) {
+            return { set: c.set, collector_number: c.collectorNumber };
+          }
+          if (c.set) {
+            return { name: c.name, set: c.set };
+          }
+          return { name: c.name };
+        });
+
+        try {
+          const res = await fetch('https://api.scryfall.com/cards/collection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifiers })
+          });
+          if (!res.ok) continue;
+          const payload = await res.json();
+          const returned = payload.data || [];
+
+          batch.forEach((card) => {
+            const key = `${card.name}|${card.set}|${card.collectorNumber}`;
+            const match = returned.find((r) => {
+              const rName = (r.name || '').toLowerCase();
+              const qName = card.name.toLowerCase();
+              return rName === qName || rName.startsWith(qName + ' //');
+            });
+            if (match) {
+              const imgUri = match.image_uris?.normal || match.card_faces?.[0]?.image_uris?.normal;
+              if (imgUri) scryfallCache[key] = imgUri;
+            }
+          });
+        } catch (_) {
+          // Fallback URLs handle offline/rate-limited cases seamlessly
+        }
+      }
+    }
+
+    async function openMoxfieldModal(artistIdx, collection, itemIdx) {
+      const artist = siteData.artists[artistIdx];
+      const item = artist[collection][itemIdx];
+      const mx = getItemMoxfield(item) || {};
+      const parsedCards = parseMoxfieldDecklist(mx.deckList || '');
+
+      activeMoxfieldView = {
+        artistName: artist.name,
+        cardTitle: item.title,
+        config: mx,
+        parsedCards
+      };
+
+      const isGallery = mx.mode === 'gallery';
+      document.getElementById('mx-view-badge').textContent = isGallery ? 'MOXFIELD VISUAL GALLERY' : 'MOXFIELD AP CATALOG';
+      document.getElementById('mx-view-title').textContent = `${artist.name} — ${item.title}`;
+      document.getElementById('mx-search-input').value = '';
+      document.getElementById('mx-foil-only').checked = false;
+
+      const extLink = document.getElementById('mx-external-link');
+      if (mx.deckUrl) {
+        extLink.href = mx.deckUrl;
+        extLink.classList.remove('hidden');
+      } else {
+        extLink.classList.add('hidden');
+      }
+
+      document.getElementById('moxfield-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      renderMoxfieldCards();
+      await hydrateScryfallImages(parsedCards);
+      if (activeMoxfieldView) renderMoxfieldCards();
+    }
+
+    function closeMoxfieldModal() {
+      document.getElementById('moxfield-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      activeMoxfieldView = null;
+    }
+
+    function renderMoxfieldCards() {
+      if (!activeMoxfieldView) return;
+      const grid = document.getElementById('mx-cards-grid');
+      const query = document.getElementById('mx-search-input').value.trim().toLowerCase();
+      const foilOnly = document.getElementById('mx-foil-only').checked;
+      const isGallery = activeMoxfieldView.config.mode === 'gallery';
+
+      const filtered = activeMoxfieldView.parsedCards.filter((c) => {
+        if (foilOnly && !c.foil) return false;
+        if (query && !c.name.toLowerCase().includes(query)) return false;
+        return true;
+      });
+
+      document.getElementById('mx-view-count').textContent = `${filtered.length} card${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-sm text-[#4A5564]">No cards match your filter.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((card) => {
+        const cacheKey = `${card.name}|${card.set}|${card.collectorNumber}`;
+        const imgSrc = scryfallCache[cacheKey] || getScryfallFallbackUrl(card);
+        const finishLabel = card.foil ? 'Foil AP' : 'Non-Foil AP';
+        const setLabel = card.set ? ` · ${card.set.toUpperCase()}` : '';
+
+        return `
+          <div class="bg-white border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between shadow-2xs">
+            <div class="relative aspect-[5/7] bg-[#E6ECF2]">
+              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(card.name)}" loading="lazy"
+                onerror="this.src='https://placehold.co/488x680/DCE2E8/4A5564?text=${encodeURIComponent(card.name)}'"
+                class="w-full h-full object-contain" />
+              ${card.foil ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-400/95 text-[#11161C] font-mono text-[10px] font-bold shadow-xs">FOIL</span>` : ''}
+            </div>
+            <div class="p-3 flex flex-col gap-2">
+              <div>
+                <h4 class="font-semibold text-xs sm:text-sm text-[#11161C] leading-snug line-clamp-2">${escapeHtml(card.name)}</h4>
+                <p class="font-mono text-[11px] text-[#4A5564] mt-0.5">${finishLabel}${setLabel}</p>
+              </div>
+              ${isGallery ? '' : `
+                <button type="button" onclick="selectMoxfieldCard('${escapeHtml(card.name).replace(/'/g, "\\'")}', '${finishLabel}${setLabel}')"
+                  class="w-full py-2 px-3 rounded-lg bg-[#1B5E48] hover:bg-[#144737] text-white text-xs font-medium transition">
+                  Select this AP
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectMoxfieldCard(cardName, finishInfo) {
+      if (!activeMoxfieldView) return;
+      const artistName = activeMoxfieldView.artistName;
+      closeMoxfieldModal();
+      openInquiryModal({
+        artistName,
+        pieceTitle: `AP Selection: ${cardName} (${finishInfo})`
+      });
+    }
+
+    function openMoxfieldEditor(artistIdx, collection, itemIdx) {
+      activeMoxfieldTarget = { artistIdx, collection, itemIdx };
+      const item = siteData.artists[artistIdx][collection][itemIdx];
+      const mx = getItemMoxfield(item) || {
+        enabled: true,
+        mode: 'catalog',
+        buttonLabel: 'Browse AP List (Pop-up)',
+        deckUrl: 'https://moxfield.com',
+        deckList: ''
+      };
+
+      document.getElementById('mx-ed-enabled').checked = Boolean(mx.enabled);
+      const modeRadios = document.querySelectorAll('input[name="mx-ed-mode"]');
+      modeRadios.forEach((r) => {
+        r.checked = r.value === (mx.mode === 'gallery' ? 'gallery' : 'catalog');
+      });
+      document.getElementById('mx-ed-label').value = mx.buttonLabel || 'Browse AP List (Pop-up)';
+      document.getElementById('mx-ed-url').value = mx.deckUrl || '';
+      document.getElementById('mx-ed-decktext').value = mx.deckList || '';
+
+      document.getElementById('moxfield-editor-modal').classList.remove('hidden');
+    }
+
+    function closeMoxfieldEditor() {
+      document.getElementById('moxfield-editor-modal').classList.add('hidden');
+      activeMoxfieldTarget = null;
+    }
+
+    function saveMoxfieldEditor() {
+      if (!activeMoxfieldTarget) return;
+      const { artistIdx, collection, itemIdx } = activeMoxfieldTarget;
+      const selectedMode = document.querySelector('input[name="mx-ed-mode"]:checked')?.value || 'catalog';
+      const targetItem = siteData.artists[artistIdx][collection][itemIdx];
+
+      delete targetItem.moxfieldPopup;
+      targetItem.moxfield = {
+        enabled: document.getElementById('mx-ed-enabled').checked,
+        mode: selectedMode,
+        buttonLabel: document.getElementById('mx-ed-label').value.trim() || (selectedMode === 'gallery' ? 'View Card Gallery (Pop-up)' : 'Browse AP List (Pop-up)'),
+        deckUrl: document.getElementById('mx-ed-url').value.trim(),
+        deckList: document.getElementById('mx-ed-decktext').value
+      };
+
+      markDirty();
+      closeMoxfieldEditor();
+      renderArtists();
+      showToast('Moxfield Pop-up saved (click Publish Changes to update live site)');
+    }
+
+    // -----------------------------------------------------------------------
     // Visual Editor Mutations (Inline Text, Add/Delete Cards & Artists, Status)
     // -----------------------------------------------------------------------
     function updateArtistField(artistIdx, field, value) {
@@ -1620,7 +3094,8 @@
           details: 'Non-Foil AP · Signed by artist',
           price: '$65 USD',
           status: 'Available',
-          image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+AP'
+          image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+AP',
+          images: [{ url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+AP', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
         });
       } else if (collection === 'commissions') {
         siteData.artists[artistIdx].commissions.push({
@@ -1628,14 +3103,16 @@
           title: 'New Commission Tier',
           details: 'Describe medium, size, and turnaround details.',
           price: 'From $120 USD',
-          image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Click+to+Upload+Sample'
+          image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Click+to+Upload+Sample',
+          images: [{ url: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Click+to+Upload+Sample', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
         });
       } else if (collection === 'portfolio') {
         siteData.artists[artistIdx].portfolio.push({
           id,
           title: 'New Artwork Title',
           details: 'Set / Medium',
-          image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+Work'
+          image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+Work',
+          images: [{ url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Click+to+Upload+Work', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
         });
       }
       markDirty();
@@ -1660,6 +3137,7 @@
         specialty: 'Fantasy Illustration · Artist Proofs & Commissions',
         bio: 'Click here to write a concise collector biography for this artist.',
         avatar: 'https://placehold.co/200x200/DCE2E8/4A5564?text=Avatar',
+        sectionOrder: ['stock', 'commissions', 'portfolio'],
         stock: [
           {
             id: newId + '-st-1',
@@ -1667,16 +3145,41 @@
             details: 'Signed AP · Worldwide tracked shipping',
             price: '$65 USD',
             status: 'Available',
-            image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+AP'
+            image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+AP',
+            images: [{ url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+AP', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
           }
         ],
         commissions: [
           {
             id: newId + '-cm-1',
-            title: 'Custom Back Sketch / Painting',
-            details: 'Bespoke artwork on white-back Artist Proof.',
-            price: 'From $140 USD',
-            image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Upload+Commission'
+            title: 'Signature & Sketch',
+            details: 'Front signature or monochrome brush-pen sketch on AP.',
+            price: 'From $25 USD',
+            image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Upload+Commission',
+            images: [{ url: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Upload+Commission', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
+          },
+          {
+            id: newId + '-cm-2',
+            title: 'Full Acrylic Back Painting',
+            details: 'Bespoke miniature acrylic painting on white-back Artist Proof.',
+            price: 'From $220 USD',
+            image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Upload+Commission',
+            images: [{ url: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Upload+Commission', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
+          },
+          {
+            id: newId + '-cm-3',
+            title: 'Many cards to choose',
+            details: 'Browse available Artist Proofs in a visual pop-up to pick your card.',
+            price: 'AP + Commission',
+            image: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Moxfield+Catalog',
+            images: [{ url: 'https://placehold.co/600x375/DCE2E8/4A5564?text=Moxfield+Catalog', fit: 'cover', posX: 50, posY: 50, zoom: 100 }],
+            moxfield: {
+              enabled: true,
+              mode: 'catalog',
+              buttonLabel: 'Browse AP List (Pop-up)',
+              deckUrl: 'https://moxfield.com',
+              deckList: '1 Sol Ring\n1 Command Tower'
+            }
           }
         ],
         portfolio: [
@@ -1684,7 +3187,8 @@
             id: newId + '-pf-1',
             title: 'Selected Illustration',
             details: 'Official Release',
-            image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+Portfolio'
+            image: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+Portfolio',
+            images: [{ url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=Upload+Portfolio', fit: 'cover', posX: 50, posY: 50, zoom: 100 }]
           }
         ]
       });
@@ -1706,37 +3210,162 @@
     }
 
     // -----------------------------------------------------------------------
-    // Image Manager Modal (Local .webp Compression + URL Option)
+    // Multi-Photo & Framing Image Manager Modal Logic
     // -----------------------------------------------------------------------
     function openImageEditorModal(mode, artistIdx, collection = null, itemIdx = null) {
       activeImageTarget = { mode, artistIdx, collection, itemIdx };
-      stagedUpload = null;
+      stagedUploadsInModal = {};
 
-      const currentSrc = mode === 'avatar'
-        ? siteData.artists[artistIdx].avatar
-        : siteData.artists[artistIdx][collection][itemIdx].image;
+      const carouselBar = document.getElementById('img-ed-carousel-bar');
+      const framingBox = document.getElementById('img-ed-framing-controls');
 
-      document.getElementById('img-ed-preview').src = resolveImageSrc(currentSrc);
-      document.getElementById('img-ed-url').value = currentSrc;
+      if (mode === 'avatar') {
+        editorSlides = [{
+          url: siteData.artists[artistIdx].avatar,
+          fit: 'cover',
+          posX: 50,
+          posY: 50,
+          zoom: 100
+        }];
+        editorActiveSlideIdx = 0;
+        carouselBar.classList.add('hidden');
+        framingBox.classList.add('hidden');
+      } else {
+        const item = siteData.artists[artistIdx][collection][itemIdx];
+        editorSlides = getItemSlides(item).map((s) => ({ ...s }));
+        editorActiveSlideIdx = Math.min(cardSlideIndex[item.id] || 0, editorSlides.length - 1);
+        carouselBar.classList.remove('hidden');
+        framingBox.classList.remove('hidden');
+      }
+
       document.getElementById('img-ed-file').value = '';
       document.getElementById('img-ed-file-info').classList.add('hidden');
+      syncImageEditorView();
       document.getElementById('image-editor-modal').classList.remove('hidden');
     }
 
     function closeImageEditorModal() {
       document.getElementById('image-editor-modal').classList.add('hidden');
       activeImageTarget = null;
-      stagedUpload = null;
+      editorSlides = [];
+      stagedUploadsInModal = {};
+    }
+
+    function syncImageEditorView() {
+      const slide = editorSlides[editorActiveSlideIdx];
+      if (!slide) return;
+
+      const previewUrl = stagedUploadsInModal[editorActiveSlideIdx]?.previewUrl || resolveImageSrc(slide.url);
+      const previewImg = document.getElementById('img-ed-preview');
+      previewImg.src = previewUrl;
+      previewImg.style.cssText = getFrameStyle(slide);
+
+      document.getElementById('img-ed-url').value = slide.url;
+      document.getElementById('img-ed-slide-count').textContent = `Photo ${editorActiveSlideIdx + 1} of ${editorSlides.length}`;
+      document.getElementById('img-ed-del-slide').disabled = editorSlides.length <= 1;
+      document.getElementById('img-ed-del-slide').classList.toggle('opacity-40', editorSlides.length <= 1);
+
+      // Fit buttons
+      const coverBtn = document.getElementById('btn-fit-cover');
+      const containBtn = document.getElementById('btn-fit-contain');
+      if (slide.fit === 'contain') {
+        containBtn.className = 'px-3 py-1 rounded-md text-xs font-medium bg-[#11161C] text-white transition';
+        coverBtn.className = 'px-3 py-1 rounded-md text-xs font-medium text-[#4A5564] hover:text-[#11161C] transition';
+      } else {
+        coverBtn.className = 'px-3 py-1 rounded-md text-xs font-medium bg-[#11161C] text-white transition';
+        containBtn.className = 'px-3 py-1 rounded-md text-xs font-medium text-[#4A5564] hover:text-[#11161C] transition';
+      }
+
+      // Sliders
+      document.getElementById('range-pos-x').value = slide.posX;
+      document.getElementById('range-pos-y').value = slide.posY;
+      document.getElementById('range-zoom').value = slide.zoom;
+      document.getElementById('val-pos-x').textContent = `${slide.posX}%`;
+      document.getElementById('val-pos-y').textContent = `${slide.posY}%`;
+      document.getElementById('val-zoom').textContent = `${slide.zoom}%`;
+
+      // Thumbnails strip
+      const thumbs = document.getElementById('img-ed-thumbs');
+      thumbs.innerHTML = editorSlides.map((s, idx) => {
+        const tSrc = stagedUploadsInModal[idx]?.previewUrl || resolveImageSrc(s.url);
+        const activeRing = idx === editorActiveSlideIdx ? 'ring-2 ring-[#1B5E48] border-[#1B5E48]' : 'border-[#DCE2E8] opacity-70 hover:opacity-100';
+        return `
+          <button type="button" onclick="selectEditorSlide(${idx})"
+            class="w-14 h-11 rounded-lg overflow-hidden border shrink-0 bg-[#E6ECF2] transition ${activeRing}">
+            <img src="${escapeHtml(tSrc)}" alt="Photo ${idx + 1}" class="w-full h-full object-cover" />
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectEditorSlide(idx) {
+      editorActiveSlideIdx = idx;
+      document.getElementById('img-ed-file').value = '';
+      document.getElementById('img-ed-file-info').classList.add('hidden');
+      syncImageEditorView();
+    }
+
+    function addEditorPhoto() {
+      editorSlides.push({
+        url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=New+Photo',
+        fit: 'cover',
+        posX: 50,
+        posY: 50,
+        zoom: 100
+      });
+      editorActiveSlideIdx = editorSlides.length - 1;
+      syncImageEditorView();
+    }
+
+    function moveEditorSlide(delta) {
+      const targetIdx = editorActiveSlideIdx + delta;
+      if (targetIdx < 0 || targetIdx >= editorSlides.length) return;
+      const [moved] = editorSlides.splice(editorActiveSlideIdx, 1);
+      editorSlides.splice(targetIdx, 0, moved);
+
+      const tempA = stagedUploadsInModal[editorActiveSlideIdx];
+      const tempB = stagedUploadsInModal[targetIdx];
+      if (tempA) stagedUploadsInModal[targetIdx] = tempA; else delete stagedUploadsInModal[targetIdx];
+      if (tempB) stagedUploadsInModal[editorActiveSlideIdx] = tempB; else delete stagedUploadsInModal[editorActiveSlideIdx];
+
+      editorActiveSlideIdx = targetIdx;
+      syncImageEditorView();
+    }
+
+    function removeEditorSlide() {
+      if (editorSlides.length <= 1) return;
+      editorSlides.splice(editorActiveSlideIdx, 1);
+      delete stagedUploadsInModal[editorActiveSlideIdx];
+      editorActiveSlideIdx = Math.max(0, editorActiveSlideIdx - 1);
+      syncImageEditorView();
+    }
+
+    function setEditorSlideFit(fit) {
+      if (!editorSlides[editorActiveSlideIdx]) return;
+      editorSlides[editorActiveSlideIdx].fit = fit;
+      syncImageEditorView();
+    }
+
+    function updateEditorFraming() {
+      const slide = editorSlides[editorActiveSlideIdx];
+      if (!slide) return;
+      slide.posX = Number(document.getElementById('range-pos-x').value);
+      slide.posY = Number(document.getElementById('range-pos-y').value);
+      slide.zoom = Number(document.getElementById('range-zoom').value);
+      syncImageEditorView();
     }
 
     document.getElementById('img-ed-url').addEventListener('input', (e) => {
-      stagedUpload = null;
+      if (!editorSlides[editorActiveSlideIdx]) return;
+      delete stagedUploadsInModal[editorActiveSlideIdx];
       document.getElementById('img-ed-file-info').classList.add('hidden');
       const val = e.target.value.trim();
-      if (val) document.getElementById('img-ed-preview').src = resolveImageSrc(val);
+      editorSlides[editorActiveSlideIdx].url = val;
+      if (val) {
+        document.getElementById('img-ed-preview').src = resolveImageSrc(val);
+      }
     });
 
-    // Compress selected image to .webp (max 1200px) using HTML5 Canvas
     document.getElementById('img-ed-file').addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file || !activeImageTarget) return;
@@ -1772,14 +3401,14 @@
           const baseName = slugify(file.name.replace(/\.[^.]+$/, ''));
           const targetPath = `images/${artistSlug}-${baseName}-${Date.now()}.webp`;
 
-          stagedUpload = {
+          stagedUploadsInModal[editorActiveSlideIdx] = {
             path: targetPath,
             base64: rawBase64,
             previewUrl: webpDataUrl
           };
+          editorSlides[editorActiveSlideIdx].url = targetPath;
 
-          document.getElementById('img-ed-preview').src = webpDataUrl;
-          document.getElementById('img-ed-url').value = targetPath;
+          syncImageEditorView();
 
           const approxKb = Math.round((rawBase64.length * 3) / 4 / 1024);
           const info = document.getElementById('img-ed-file-info');
@@ -1793,27 +3422,30 @@
 
     function applyImageChange() {
       if (!activeImageTarget) return;
-      const newUrl = document.getElementById('img-ed-url').value.trim();
-      if (!newUrl) return;
 
-      if (stagedUpload) {
-        pendingUploads[stagedUpload.path] = {
-          base64: stagedUpload.base64,
-          previewUrl: stagedUpload.previewUrl
+      Object.values(stagedUploadsInModal).forEach((up) => {
+        pendingUploads[up.path] = {
+          base64: up.base64,
+          previewUrl: up.previewUrl
         };
-      }
+      });
 
       const { mode, artistIdx, collection, itemIdx } = activeImageTarget;
       if (mode === 'avatar') {
-        siteData.artists[artistIdx].avatar = newUrl;
+        if (editorSlides[0]?.url) {
+          siteData.artists[artistIdx].avatar = editorSlides[0].url;
+        }
       } else {
-        siteData.artists[artistIdx][collection][itemIdx].image = newUrl;
+        const item = siteData.artists[artistIdx][collection][itemIdx];
+        item.images = editorSlides.map((s) => ({ ...s }));
+        item.image = editorSlides[0]?.url || item.image;
+        cardSlideIndex[item.id] = editorActiveSlideIdx;
       }
 
       markDirty();
       closeImageEditorModal();
       renderArtists();
-      showToast('Image updated (click Publish Changes to save to GitHub)');
+      showToast('Photos & framing updated (click Publish Changes to save to GitHub)');
     }
 
     // -----------------------------------------------------------------------
