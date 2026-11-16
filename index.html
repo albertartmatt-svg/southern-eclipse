@@ -2450,40 +2450,388 @@
       return html;
     }
 
-// Default section titles & subtitles (overridable per artist via artist.sectionMeta)
-    const DEFAULT_SECTION_META = {
-      stock: {
-        title: 'First Come, First Serve — Artist Proofs & Originals',
-        subtitle: 'Direct studio allocation · Worldwide tracked shipping'
-      },
-      commissions: {
-        title: 'Commission Menu & Examples',
-        subtitle: 'Signatures, custom ink sketches & full acrylic back paintings'
-      },
-      portfolio: {
-        title: 'Selected Card Works',
-        subtitle: 'Published illustrations & archive'
-      }
-    };
+    function renderArtists() {
+      const container = document.getElementById('artists-container');
+      lightboxItems = [];
 
-    function getSectionMeta(artist, secKey) {
-      const defaults = DEFAULT_SECTION_META[secKey] || { title: '', subtitle: '' };
-      const custom = (artist.sectionMeta && artist.sectionMeta[secKey]) || {};
-      return {
-        title: custom.title !== undefined ? custom.title : defaults.title,
-        subtitle: custom.subtitle !== undefined ? custom.subtitle : defaults.subtitle
-      };
+      const filtered = getFilteredArtists();
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl p-12 text-center">
+            <p class="font-display-lower font-semibold text-lg text-[#11161C] mb-2">No matching artists or available pieces</p>
+            <p class="text-sm text-[#4A5564] mb-4">Try clearing the country filter or turning off "In-Stock APs Only".</p>
+            <button type="button" onclick="resetFilters()" class="px-4 py-2 rounded-xl bg-[#2E5A78] text-white text-xs font-medium">Reset Filters</button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((artist) => {
+        const artistIdx = siteData.artists.findIndex((a) => a.id === artist.id);
+        const order = Array.isArray(artist.sectionOrder) && artist.sectionOrder.length === 3
+          ? artist.sectionOrder
+          : ['stock', 'commissions', 'portfolio'];
+
+        const sectionsHtml = order.map((secKey) => {
+          if (secKey === 'stock') {
+            const visibleStock = (artist.stock || []).filter((item) => {
+              if (inStockOnly && !isEditMode) return item.status === 'Available';
+              return true;
+            });
+
+            const stockCardsHtml = visibleStock.map((item) => {
+              const itemIdx = artist.stock.findIndex((s) => s.id === item.id);
+              const slides = getItemSlides(item);
+              const lbStartIndex = lightboxItems.length;
+              slides.forEach((sl) => {
+                lightboxItems.push({
+                  image: resolveImageSrc(sl.url),
+                  artistName: artist.name,
+                  category: 'FIRST COME, FIRST SERVE · STOCK',
+                  title: item.title,
+                  details: item.details,
+                  price: item.price,
+                  status: item.status
+                });
+              });
+
+              const isSold = item.status === 'Sold';
+              const isReserved = item.status === 'Reserved';
+
+              return `
+                <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="stock" data-item-idx="${itemIdx}"
+                  class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
+                  ${isEditMode ? `
+                    <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                      <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                        data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="stock" data-item-idx="${itemIdx}" title="Drag to reorder card">
+                        ⋮⋮
+                      </button>
+                      <button type="button" onclick="deleteArtistItem(${artistIdx}, 'stock', ${itemIdx})" title="Delete piece"
+                        class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                        &times;
+                      </button>
+                    </div>` : ''}
+
+                  <div>
+                    <div class="relative">
+                      ${renderCardMedia(item, artistIdx, 'stock', itemIdx, 'aspect-[4/3]', lbStartIndex, slides)}
+                      <div class="absolute top-2.5 left-2.5 pointer-events-none">
+                        ${renderStatusPill(item.status)}
+                      </div>
+                    </div>
+
+                    <div class="p-4">
+                      <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'title', this.textContent)"` : ''}
+                        class="font-semibold text-sm sm:text-base text-[#11161C] leading-snug mb-1">
+                        ${escapeHtml(item.title)}
+                      </h4>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'details', this.textContent)"` : ''}
+                        class="text-xs text-[#4A5564] leading-relaxed">
+                        ${isEditMode ? escapeHtml(item.details) : formatRichText(item.details)}
+                      </p>
+
+                      ${renderMoxfieldTrigger(artist, artistIdx, 'stock', item, itemIdx)}
+
+                      ${isEditMode ? `
+                        <div class="mt-3 pt-2.5 border-t border-[#DCE2E8] flex items-center gap-1">
+                          ${['Available', 'Reserved', 'Sold'].map((st) => `
+                            <button type="button" onclick="setStockStatus(${artistIdx}, ${itemIdx}, '${st}')"
+                              class="flex-1 py-1 rounded-md font-mono text-[10px] font-medium border transition ${
+                                item.status === st
+                                  ? 'bg-[#11161C] text-white border-[#11161C]'
+                                  : 'bg-white text-[#4A5564] border-[#DCE2E8] hover:border-[#11161C]'
+                              }">
+                              ${st}
+                            </button>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+
+                  <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
+                    <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'stock', ${itemIdx}, 'price', this.textContent)"` : ''}
+                      class="font-mono text-sm font-medium text-[#11161C]">
+                      ${escapeHtml(item.price)}
+                    </span>
+
+                    ${isSold
+                      ? `<button type="button" disabled class="px-3.5 py-2 rounded-xl bg-[#E2E8F0] text-[#475569] text-xs font-medium cursor-not-allowed">Sold</button>`
+                      : `<button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: '${escapeHtml(item.title + ' (' + item.price + ')').replace(/'/g, "\\'")}' })"
+                          class="px-3.5 py-2 rounded-xl text-xs font-medium transition ${
+                            isReserved
+                              ? 'bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#B45309] border border-[#F59E0B]/40'
+                              : 'bg-[#1B5E48] hover:bg-[#144737] text-white shadow-xs'
+                          }">
+                          ${isReserved ? 'Inquire Backup' : 'Claim / Inquire'}
+                        </button>`
+                    }
+                  </div>
+                </article>
+              `;
+            }).join('');
+
+            return `
+              <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="stock" class="space-y-4 rounded-xl transition">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-start gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                        data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="stock" title="Drag to reorder section">
+                        ⋮⋮
+                      </button>` : ''}
+                    <div>
+                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        First Come, First Serve — Artist Proofs &amp; Originals
+                      </h3>
+                      <p class="font-mono text-xs text-[#4A5564]">Direct studio allocation · Worldwide tracked shipping</p>
+                    </div>
+                  </div>
+                  ${isEditMode ? `
+                    <button type="button" onclick="addArtistItem(${artistIdx}, 'stock')"
+                      class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                      + Add Stock Piece
+                    </button>` : ''}
+                </div>
+
+                ${visibleStock.length > 0
+                  ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">${stockCardsHtml}</div>`
+                  : `<p class="text-xs font-mono text-[#4A5564] bg-[#F1F4F7] p-4 rounded-xl border border-[#DCE2E8]">No items listed in this stock view.</p>`
+                }
+              </div>
+            `;
+          }
+
+          if (secKey === 'commissions') {
+            const commissionCardsHtml = (artist.commissions || []).map((comm, commIdx) => {
+              const slides = getItemSlides(comm);
+              const lbStartIndex = lightboxItems.length;
+              slides.forEach((sl) => {
+                lightboxItems.push({
+                  image: resolveImageSrc(sl.url),
+                  artistName: artist.name,
+                  category: 'COMMISSION MENU & EXAMPLE',
+                  title: comm.title,
+                  details: comm.details,
+                  price: comm.price
+                });
+              });
+
+              return `
+                <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="commissions" data-item-idx="${commIdx}"
+                  class="group relative bg-[#F1F4F7]/60 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between transition hover:border-[#2E5A78]/60">
+                  ${isEditMode ? `
+                    <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                      <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                        data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="commissions" data-item-idx="${commIdx}" title="Drag to reorder card">
+                        ⋮⋮
+                      </button>
+                      <button type="button" onclick="deleteArtistItem(${artistIdx}, 'commissions', ${commIdx})" title="Delete commission tier"
+                        class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                        &times;
+                      </button>
+                    </div>` : ''}
+
+                  <div>
+                    ${renderCardMedia(comm, artistIdx, 'commissions', commIdx, 'aspect-[16/10]', lbStartIndex, slides)}
+                    <div class="p-4">
+                      <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'title', this.textContent)"` : ''}
+                        class="font-semibold text-sm sm:text-base text-[#11161C] mb-1">
+                        ${escapeHtml(comm.title)}
+                      </h4>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'details', this.textContent)"` : ''}
+                        class="text-xs text-[#4A5564] leading-relaxed">
+                        ${isEditMode ? escapeHtml(comm.details) : formatRichText(comm.details)}
+                      </p>
+
+                      ${renderMoxfieldTrigger(artist, artistIdx, 'commissions', comm, commIdx)}
+                    </div>
+                  </div>
+
+                  <div class="px-4 pb-4 pt-2 flex items-center justify-between gap-3 border-t border-[#DCE2E8]/60">
+                    <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'commissions', ${commIdx}, 'price', this.textContent)"` : ''}
+                      class="font-mono text-xs sm:text-sm font-medium text-[#2E5A78]">
+                      ${escapeHtml(comm.price)}
+                    </span>
+                    <button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: 'Commission: ${escapeHtml(comm.title).replace(/'/g, "\\'")}' })"
+                      class="px-3.5 py-2 rounded-xl bg-[#FAFBFD] hover:bg-[#2E5A78] text-[#11161C] hover:text-white border border-[#DCE2E8] hover:border-[#2E5A78] text-xs font-medium transition">
+                      Inquire
+                    </button>
+                  </div>
+                </article>
+              `;
+            }).join('');
+
+            return `
+              <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="commissions" class="space-y-4 pt-2 rounded-xl transition">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-start gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                        data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="commissions" title="Drag to reorder section">
+                        ⋮⋮
+                      </button>` : ''}
+                    <div>
+                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        Commission Menu &amp; Examples
+                      </h3>
+                      <p class="font-mono text-xs text-[#4A5564]">Signatures, custom ink sketches &amp; full acrylic back paintings</p>
+                    </div>
+                  </div>
+                  ${isEditMode ? `
+                    <button type="button" onclick="addArtistItem(${artistIdx}, 'commissions')"
+                      class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                      + Add Commission
+                    </button>` : ''}
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  ${commissionCardsHtml}
+                </div>
+              </div>
+            `;
+          }
+
+          // Portfolio Section
+          const portfolioCardsHtml = (artist.portfolio || []).map((work, workIdx) => {
+            const slides = getItemSlides(work);
+            const lbStartIndex = lightboxItems.length;
+            slides.forEach((sl) => {
+              lightboxItems.push({
+                image: resolveImageSrc(sl.url),
+                artistName: artist.name,
+                category: 'SELECTED CARD WORKS · PORTFOLIO',
+                title: work.title,
+                details: work.details,
+                price: ''
+              });
+            });
+
+            return `
+              <article data-drag-unit="item" data-artist-idx="${artistIdx}" data-collection="portfolio" data-item-idx="${workIdx}"
+                class="group relative bg-[#F1F4F7]/50 border border-[#DCE2E8] rounded-xl overflow-hidden flex flex-col justify-between">
+                ${isEditMode ? `
+                  <div class="absolute top-2 right-2 z-20 flex items-center gap-1">
+                    <button type="button" class="drag-handle px-2 h-7 rounded-full bg-[#11161C]/85 hover:bg-[#11161C] text-white font-mono text-xs flex items-center justify-center shadow-md"
+                      data-handle-type="item" data-artist-idx="${artistIdx}" data-collection="portfolio" data-item-idx="${workIdx}" title="Drag to reorder card">
+                      ⋮⋮
+                    </button>
+                    <button type="button" onclick="deleteArtistItem(${artistIdx}, 'portfolio', ${workIdx})" title="Delete portfolio item"
+                      class="w-7 h-7 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                      &times;
+                    </button>
+                  </div>` : ''}
+
+                <div>
+                  ${renderCardMedia(work, artistIdx, 'portfolio', workIdx, 'aspect-[4/3]', lbStartIndex, slides)}
+                  <div class="p-3">
+                    <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'title', this.textContent)"` : ''}
+                      class="font-medium text-xs sm:text-sm text-[#11161C] truncate">
+                      ${escapeHtml(work.title)}
+                    </h4>
+                    <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'details', this.textContent)"` : ''}
+                      class="font-mono text-[11px] text-[#4A5564] mt-0.5 leading-relaxed">
+                      ${isEditMode ? escapeHtml(work.details) : formatRichText(work.details)}
+                    </p>
+                    ${renderMoxfieldTrigger(artist, artistIdx, 'portfolio', work, workIdx)}
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('');
+
+          return `
+            <div data-drag-unit="section" data-artist-idx="${artistIdx}" data-section-key="portfolio" class="space-y-4 pt-2 rounded-xl transition">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-start gap-2.5">
+                  ${isEditMode ? `
+                    <button type="button" class="drag-handle mt-0.5 px-2 py-1 rounded-lg bg-[#F1F4F7] hover:bg-[#DCE2E8] border border-[#DCE2E8] font-mono text-xs text-[#11161C]"
+                      data-handle-type="section" data-artist-idx="${artistIdx}" data-section-key="portfolio" title="Drag to reorder section">
+                      ⋮⋮
+                    </button>` : ''}
+                  <div>
+                    <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                      Selected Card Works
+                    </h3>
+                    <p class="font-mono text-xs text-[#4A5564]">Published illustrations &amp; archive</p>
+                  </div>
+                </div>
+                ${isEditMode ? `
+                  <button type="button" onclick="addArtistItem(${artistIdx}, 'portfolio')"
+                    class="px-3 py-1.5 rounded-xl bg-[#2E5A78] hover:bg-[#244861] text-white text-xs font-medium transition">
+                    + Add Portfolio Work
+                  </button>` : ''}
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                ${portfolioCardsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <section id="artist-${escapeHtml(artist.id)}" data-drag-unit="artist" data-artist-idx="${artistIdx}"
+            class="scroll-mt-36 bg-[#FAFBFD] border border-[#DCE2E8] rounded-2xl p-5 sm:p-8 shadow-xs space-y-8 transition">
+            <!-- Artist Header -->
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-[#DCE2E8]">
+              <div class="flex flex-col sm:flex-row items-start gap-5">
+                <div onclick="${isEditMode ? `openImageEditorModal('avatar', ${artistIdx})` : ''}"
+                  class="editable-image-wrap relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-[#DCE2E8] shrink-0 bg-[#F1F4F7]">
+                  <img src="${escapeHtml(resolveImageSrc(artist.avatar))}" alt="${escapeHtml(artist.name)}"
+                    onerror="this.src='https://placehold.co/200x200/DCE2E8/4A5564?text=Artist'"
+                    class="w-full h-full object-cover" />
+                </div>
+
+                <div class="space-y-1.5 max-w-2xl">
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    ${isEditMode ? `
+                      <button type="button" class="drag-handle px-2.5 py-1 rounded-lg bg-[#11161C] text-white font-mono text-xs shadow-xs"
+                        data-handle-type="artist" data-artist-idx="${artistIdx}" title="Drag to reorder artist">
+                        ⋮⋮ Move Artist
+                      </button>` : ''}
+                    <h2 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'name', this.textContent)"` : ''}
+                      class="font-display-lower font-semibold text-2xl sm:text-3xl text-[#11161C]">
+                      ${escapeHtml(artist.name)}
+                    </h2>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F1F4F7] border border-[#DCE2E8] font-mono text-xs text-[#2E5A78]">
+                      <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'countryCode', this.textContent)"` : ''}>${escapeHtml(artist.countryCode)}</span>
+                      <span>·</span>
+                      <span ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'countryName', this.textContent)"` : ''}>${escapeHtml(artist.countryName)}</span>
+                    </span>
+                  </div>
+
+                  <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'specialty', this.textContent)"` : ''}
+                    class="font-mono text-xs sm:text-sm text-[#2E5A78] font-medium">
+                    ${escapeHtml(artist.specialty)}
+                  </p>
+
+                  <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateArtistField(${artistIdx}, 'bio', this.textContent)"` : ''}
+                    class="text-sm text-[#4A5564] leading-relaxed pt-1">
+                    ${isEditMode ? escapeHtml(artist.bio) : formatRichText(artist.bio)}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button type="button" onclick="openInquiryModal({ artistName: '${escapeHtml(artist.name).replace(/'/g, "\\'")}', pieceTitle: 'Private Commission Request' })"
+                  class="px-4 py-2.5 rounded-xl bg-[#1B5E48] hover:bg-[#144737] text-white text-xs sm:text-sm font-medium transition shadow-xs">
+                  Request Commission
+                </button>
+                ${isEditMode ? `
+                  <button type="button" onclick="deleteArtist(${artistIdx})"
+                    class="px-3 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-medium transition">
+                    Delete Artist
+                  </button>` : ''}
+              </div>
+            </div>
+
+            ${sectionsHtml}
+          </section>
+        `;
+      }).join('');
     }
 
-    function updateSectionMetaField(artistIdx, secKey, field, value) {
-      const artist = siteData.artists[artistIdx];
-      if (!artist.sectionMeta) artist.sectionMeta = {};
-      if (!artist.sectionMeta[secKey]) {
-        artist.sectionMeta[secKey] = { ...getSectionMeta(artist, secKey) };
-      }
-      artist.sectionMeta[secKey][field] = value.trim();
-      markDirty();
-    }
     function resetFilters() {
       selectedCountry = 'All';
       inStockOnly = false;
