@@ -1643,20 +1643,29 @@
 <!-- =====================================================================
        HERO & COLLECTOR POLICY BANNER
        ===================================================================== -->
-  <section id="hero-banner-wrap" onclick="if(isEditMode) openImageEditorModal('hero', 0)" class="editable-image-wrap relative bg-[#FAFBFD] border-b border-[#DCE2E8] overflow-hidden">
-    <!-- Imagen de fondo del Header (Placeholder editable) -->
+  <section id="hero-banner-wrap" class="relative bg-[#FAFBFD] border-b border-[#DCE2E8] overflow-hidden">
+    <!-- Imagen de fondo del Header -->
     <img 
       id="hero-bg-img"
       src="https://placehold.co/1600x600/DCE2E8/4A5564?text=Header+Banner+Placeholder" 
       alt="Southern Eclipse Banner" 
       class="absolute inset-0 w-full h-full object-cover object-center opacity-30 pointer-events-none"
     />
-    <!-- Degradado suave para asegurar que el texto siempre se lea bien -->
+    <!-- Degradado suave -->
     <div class="absolute inset-0 bg-gradient-to-r from-[#FAFBFD] via-[#FAFBFD]/85 to-transparent pointer-events-none"></div>
 
-    <!-- Contenido original (onClick stopPropagation para que puedas editar los textos sin abrir el modal de imagen) -->
+    <!-- Botón flotante para cambiar la imagen (Solo visible en Edit Mode) -->
+    <button 
+      type="button" 
+      id="btn-edit-hero-img"
+      onclick="openImageEditorModal('hero', 0)"
+      class="hidden absolute top-4 right-4 z-30 px-3.5 py-2 rounded-xl bg-[#11161C]/90 hover:bg-[#2E5A78] text-white font-mono text-xs font-medium shadow-lg border border-white/15 transition cursor-pointer">
+      ✎ Change Header Image
+    </button>
+
+    <!-- Contenido -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      <div onclick="if(isEditMode) event.stopPropagation()" class="max-w-3xl space-y-4">
+      <div class="max-w-3xl space-y-4">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1F4F7]/90 border border-[#DCE2E8] font-mono text-xs text-[#2E5A78]">
           <span>CHILE · COLOMBIA · BRAZIL · BOLIVIA</span>
         </div>
