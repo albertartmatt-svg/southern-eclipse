@@ -2450,6 +2450,41 @@
       return html;
     }
 
+   // Default section titles & subtitles (overridable per artist via artist.sectionMeta)
+    const DEFAULT_SECTION_META = {
+      stock: {
+        title: 'First Come, First Serve — Artist Proofs & Originals',
+        subtitle: 'Direct studio allocation · Worldwide tracked shipping'
+      },
+      commissions: {
+        title: 'Commission Menu & Examples',
+        subtitle: 'Signatures, custom ink sketches & full acrylic back paintings'
+      },
+      portfolio: {
+        title: 'Selected Card Works',
+        subtitle: 'Published illustrations & archive'
+      }
+    };
+
+    function getSectionMeta(artist, secKey) {
+      const defaults = DEFAULT_SECTION_META[secKey] || { title: '', subtitle: '' };
+      const custom = (artist.sectionMeta && artist.sectionMeta[secKey]) || {};
+      return {
+        title: custom.title !== undefined ? custom.title : defaults.title,
+        subtitle: custom.subtitle !== undefined ? custom.subtitle : defaults.subtitle
+      };
+    }
+
+    function updateSectionMetaField(artistIdx, secKey, field, value) {
+      const artist = siteData.artists[artistIdx];
+      if (!artist.sectionMeta) artist.sectionMeta = {};
+      if (!artist.sectionMeta[secKey]) {
+        artist.sectionMeta[secKey] = { ...getSectionMeta(artist, secKey) };
+      }
+      artist.sectionMeta[secKey][field] = value.trim();
+      markDirty();
+    }
+
     function renderArtists() {
       const container = document.getElementById('artists-container');
       lightboxItems = [];
@@ -2472,6 +2507,8 @@
           : ['stock', 'commissions', 'portfolio'];
 
         const sectionsHtml = order.map((secKey) => {
+          const secMeta = getSectionMeta(artist, secKey);
+
           if (secKey === 'stock') {
             const visibleStock = (artist.stock || []).filter((item) => {
               if (inStockOnly && !isEditMode) return item.status === 'Available';
@@ -2581,10 +2618,14 @@
                         ⋮⋮
                       </button>` : ''}
                     <div>
-                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                        First Come, First Serve — Artist Proofs &amp; Originals
+                      <h3 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'stock', 'title', this.textContent)"` : ''}
+                        class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        ${escapeHtml(secMeta.title)}
                       </h3>
-                      <p class="font-mono text-xs text-[#4A5564]">Direct studio allocation · Worldwide tracked shipping</p>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'stock', 'subtitle', this.textContent)"` : ''}
+                        class="font-mono text-xs text-[#4A5564]">
+                        ${isEditMode ? escapeHtml(secMeta.subtitle) : formatRichText(secMeta.subtitle)}
+                      </p>
                     </div>
                   </div>
                   ${isEditMode ? `
@@ -2672,10 +2713,14 @@
                         ⋮⋮
                       </button>` : ''}
                     <div>
-                      <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                        Commission Menu &amp; Examples
+                      <h3 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'commissions', 'title', this.textContent)"` : ''}
+                        class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                        ${escapeHtml(secMeta.title)}
                       </h3>
-                      <p class="font-mono text-xs text-[#4A5564]">Signatures, custom ink sketches &amp; full acrylic back paintings</p>
+                      <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'commissions', 'subtitle', this.textContent)"` : ''}
+                        class="font-mono text-xs text-[#4A5564]">
+                        ${isEditMode ? escapeHtml(secMeta.subtitle) : formatRichText(secMeta.subtitle)}
+                      </p>
                     </div>
                   </div>
                   ${isEditMode ? `
@@ -2726,7 +2771,7 @@
                   ${renderCardMedia(work, artistIdx, 'portfolio', workIdx, 'aspect-[4/3]', lbStartIndex, slides)}
                   <div class="p-3">
                     <h4 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'title', this.textContent)"` : ''}
-                      class="font-medium text-xs sm:text-sm text-[#11161C] truncate">
+                      class="font-medium text-xs sm:text-sm text-[#11161C] leading-snug">
                       ${escapeHtml(work.title)}
                     </h4>
                     <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateItemField(${artistIdx}, 'portfolio', ${workIdx}, 'details', this.textContent)"` : ''}
@@ -2750,10 +2795,14 @@
                       ⋮⋮
                     </button>` : ''}
                   <div>
-                    <h3 class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
-                      Selected Card Works
+                    <h3 ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'portfolio', 'title', this.textContent)"` : ''}
+                      class="font-display-lower font-semibold text-base sm:text-lg text-[#11161C]">
+                      ${escapeHtml(secMeta.title)}
                     </h3>
-                    <p class="font-mono text-xs text-[#4A5564]">Published illustrations &amp; archive</p>
+                    <p ${isEditMode ? `contenteditable="true" data-editable="true" oninput="updateSectionMetaField(${artistIdx}, 'portfolio', 'subtitle', this.textContent)"` : ''}
+                      class="font-mono text-xs text-[#4A5564]">
+                      ${isEditMode ? escapeHtml(secMeta.subtitle) : formatRichText(secMeta.subtitle)}
+                    </p>
                   </div>
                 </div>
                 ${isEditMode ? `
@@ -2831,7 +2880,6 @@
         `;
       }).join('');
     }
-
     function resetFilters() {
       selectedCountry = 'All';
       inStockOnly = false;
