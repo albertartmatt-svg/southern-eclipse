@@ -321,6 +321,17 @@
 
     /* Modal headings */
     body .font-display-lower { font-weight: 600; }
+
+    /* Banner: edit button (visible only in Visual Edit Mode) */
+    .cover-edit {
+      display: none; position: absolute; top: 1rem; right: 1rem; z-index: 4;
+      align-items: center; gap: .5rem; padding: .55rem .9rem;
+      background: var(--ink-primary); color: #F8FAFC; border: 1px solid var(--accent-glacial);
+      border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-size: .75rem; cursor: pointer;
+      transition: background-color .15s ease;
+    }
+    .cover-edit:hover { background: var(--accent-glacial); }
+    body.edit-mode-active .cover-edit { display: inline-flex; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#2E5A78] selection:text-white">
@@ -1850,11 +1861,16 @@
   </header>
 
   <!-- =====================================================================
-       COVER BANNER (rotating). To swap images, edit BANNER_SLIDES in the
-       <script id="cover-banner-script"> block at the bottom of this file.
+       COVER BANNER (rotating). Manage it from the Visual Editor (?edit) with
+       the "Edit Banner" button. Optional defaults live in BANNER_SLIDES in
+       the cover banner script at the bottom of this file.
        ===================================================================== -->
   <section id="cover-banner" class="cover" role="region" aria-roledescription="carousel" aria-label="Featured artwork" hidden>
     <div class="cover-stage" id="cover-stage"></div>
+    <button type="button" class="cover-edit" id="cover-edit">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="square" d="M4 20h4l10-10-4-4L4 16v4z"/></svg>
+      Edit Banner
+    </button>
     <div class="cover-scrim"></div>
     <div class="cover-ui">
       <div class="cover-ui-inner">
@@ -2111,7 +2127,7 @@
       <div class="flex items-start justify-between gap-4">
         <div>
           <span class="font-mono text-xs text-[#2E5A78]">MULTI-PHOTO &amp; FRAMING MANAGER</span>
-          <h3 class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Card Photos &amp; Framing</h3>
+          <h3 id="img-ed-title" class="font-display-lower font-semibold text-lg text-[#11161C] mt-0.5">Card Photos &amp; Framing</h3>
         </div>
         <button type="button" onclick="closeImageEditorModal()" class="p-1.5 rounded-lg hover:bg-[#F1F4F7] text-[#4A5564]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -4248,7 +4264,19 @@
       const carouselBar = document.getElementById('img-ed-carousel-bar');
       const framingBox = document.getElementById('img-ed-framing-controls');
 
-      if (mode === 'avatar') {
+      const isBanner = mode === 'banner';
+      document.getElementById('img-ed-preview-box').style.aspectRatio = isBanner ? '21 / 9' : '';
+      document.getElementById('img-ed-title').textContent = isBanner ? 'Cover Banner Photos & Framing' : 'Card Photos & Framing';
+
+      if (isBanner) {
+        editorSlides = window.getCoverSlides().map((s) => ({ url: s.url, fit: s.fit, posX: s.posX, posY: s.posY, zoom: s.zoom }));
+        if (!editorSlides.length) {
+          editorSlides = [{ url: 'https://placehold.co/2400x900/DCE2E8/4A5564?text=New+Banner+Image', fit: 'cover', posX: 50, posY: 50, zoom: 100 }];
+        }
+        editorActiveSlideIdx = 0;
+        carouselBar.classList.remove('hidden');
+        framingBox.classList.remove('hidden');
+      } else if (mode === 'avatar') {
         editorSlides = [{
           url: siteData.artists[artistIdx].avatar,
           fit: 'cover',
@@ -4336,7 +4364,7 @@
 
     function addEditorPhoto() {
       editorSlides.push({
-        url: 'https://placehold.co/600x450/DCE2E8/4A5564?text=New+Photo',
+        url: (activeImageTarget && activeImageTarget.mode === 'banner') ? 'https://placehold.co/2400x900/DCE2E8/4A5564?text=New+Banner+Image' : 'https://placehold.co/600x450/DCE2E8/4A5564?text=New+Photo',
         fit: 'cover',
         posX: 50,
         posY: 50,
@@ -4403,7 +4431,7 @@
       reader.onload = (ev) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1200;
+          const maxDim = activeImageTarget.mode === 'banner' ? 2400 : 1200;
           let width = img.width;
           let height = img.height;
 
@@ -4426,7 +4454,7 @@
           const webpDataUrl = canvas.toDataURL('image/webp', 0.86);
           const rawBase64 = webpDataUrl.split(',')[1];
 
-          const artistSlug = slugify(siteData.artists[activeImageTarget.artistIdx].id);
+          const artistSlug = activeImageTarget.mode === 'banner' ? 'banner' : slugify(siteData.artists[activeImageTarget.artistIdx].id);
           const baseName = slugify(file.name.replace(/\.[^.]+$/, ''));
           const targetPath = `images/${artistSlug}-${baseName}-${Date.now()}.webp`;
 
@@ -4458,6 +4486,17 @@
           previewUrl: up.previewUrl
         };
       });
+
+      if (activeImageTarget.mode === 'banner') {
+        siteData.agency.banners = editorSlides
+          .filter((sl) => sl.url)
+          .map((sl) => ({ url: sl.url, fit: sl.fit === 'contain' ? 'contain' : 'cover', posX: sl.posX, posY: sl.posY, zoom: sl.zoom }));
+        markDirty();
+        closeImageEditorModal();
+        window.renderCoverBanner();
+        showToast('Banner updated (click Publish Changes to save to GitHub)');
+        return;
+      }
 
       const { mode, artistIdx, collection, itemIdx } = activeImageTarget;
       if (mode === 'avatar') {
@@ -4683,21 +4722,19 @@
 
 <script id="cover-banner-script">
   /* =====================================================================
-     COVER BANNER — easy to swap
+     COVER BANNER
      ---------------------------------------------------------------------
-     Put your own images here. One object per slide:
-       src:   image path or URL (wide images work best, e.g. 2400x900)
-       alt:   short description for screen readers (optional)
-       fit:   'cover' (fills the banner, default) or 'contain' (shows the
-              whole image over a blurred backdrop — good for tall images)
-       pos:   focal point when using 'cover', e.g. 'center 30%' (optional)
-     Leave the list empty and the banner will use the first artwork of each
-     artist from your gallery data as placeholders.
+     Normally you manage the banner from the Visual Editor (?edit): click
+     "Edit Banner" on top of the cover, add/replace/reorder photos, adjust
+     framing and press "Publish Changes". The slides are stored in the site
+     data (siteData.agency.banners).
+
+     BANNER_SLIDES below is only an optional default used while the editor
+     has no saved banner. Same shape as the editor uses:
+       { url: 'images/banner-1.webp', fit: 'cover', posX: 50, posY: 50, zoom: 100 }
+     If both are empty, the first artwork of each artist is shown as placeholder.
      ===================================================================== */
-  const BANNER_SLIDES = [
-    // { src: 'images/banner-1.webp', alt: 'Banner 1', fit: 'cover', pos: 'center 30%' },
-    // { src: 'images/banner-2.webp', alt: 'Banner 2' },
-  ];
+  const BANNER_SLIDES = [];
   const BANNER_INTERVAL_MS = 6000;
 
   (function initCoverBanner() {
@@ -4708,44 +4745,44 @@
     const nav = document.getElementById('cover-nav');
     if (!root || !stage) return;
 
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const PLACEHOLDER = 'https://placehold.co/2400x900/DCE2E8/4A5564?text=Banner+Image';
+
+    let slides = [], slideEls = [], barEls = [];
+    let idx = 0, timer = null, remaining = BANNER_INTERVAL_MS, startedAt = 0, paused = false;
+
+    function normalize(s) {
+      return {
+        url: s.url || s.src || '',
+        alt: s.alt || '',
+        fit: s.fit === 'contain' ? 'contain' : 'cover',
+        posX: s.posX ?? 50,
+        posY: s.posY ?? 50,
+        zoom: s.zoom ?? 100
+      };
+    }
+
     function fallbackSlides() {
+      const out = [];
       try {
-        const out = [];
         (siteData.artists || []).forEach((a) => {
           const pick = (a.portfolio && a.portfolio[0]) || (a.stock && a.stock[0]) || (a.commissions && a.commissions[0]);
           const url = pick && ((pick.images && pick.images[0] && pick.images[0].url) || pick.image);
-          if (url) out.push({ src: resolveImageSrc(url), alt: a.name, fit: 'contain' });
+          if (url) out.push({ url, alt: a.name, fit: 'contain' });
         });
-        return out.slice(0, 6);
-      } catch (e) { return []; }
+      } catch (e) {}
+      return out.slice(0, 6);
     }
 
-    const slides = (BANNER_SLIDES.length ? BANNER_SLIDES : fallbackSlides());
-    if (!slides.length) return;
-    root.hidden = false;
-
-    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    root.style.setProperty('--cover-ms', BANNER_INTERVAL_MS + 'ms');
-
-    stage.innerHTML = slides.map((s, i) => {
-      const fit = s.fit === 'contain' ? 'fit-contain' : '';
-      const pos = s.pos ? ` style="object-position:${esc(s.pos)}"` : '';
-      return `<div class="cover-slide ${fit}" data-i="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} / ${slides.length}">
-        <img class="bg" src="${esc(s.src)}" alt="" aria-hidden="true" />
-        <img class="fg" src="${esc(s.src)}" alt="${esc(s.alt || '')}"${pos} ${i === 0 ? '' : 'loading="lazy"'} />
-      </div>`;
-    }).join('');
-
-    bars.innerHTML = slides.map((_, i) =>
-      `<button type="button" class="cover-bar" data-i="${i}" aria-label="Go to image ${i + 1}"><i></i></button>`).join('');
-
-    const slideEls = [...stage.querySelectorAll('.cover-slide')];
-    const barEls = [...bars.querySelectorAll('.cover-bar')];
-    const multi = slides.length > 1;
-    if (!multi) { bars.style.display = 'none'; nav.style.display = 'none'; }
-
-    let idx = 0, timer = null, remaining = BANNER_INTERVAL_MS, startedAt = 0;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Current slides (raw urls). Also used by the editor modal.
+    function getSlides() {
+      let saved = [];
+      try { saved = (siteData.agency && Array.isArray(siteData.agency.banners)) ? siteData.agency.banners : []; } catch (e) {}
+      const base = saved.length ? saved : (BANNER_SLIDES.length ? BANNER_SLIDES : fallbackSlides());
+      return base.map(normalize).filter((s) => s.url);
+    }
+    window.getCoverSlides = getSlides;
 
     function show(n) {
       idx = (n + slides.length) % slides.length;
@@ -4759,7 +4796,8 @@
       });
       count.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
       remaining = BANNER_INTERVAL_MS;
-      if (multi && !reduce) schedule();
+      clearTimeout(timer);
+      if (slides.length > 1 && !reduce && !paused) schedule();
     }
     function schedule() {
       clearTimeout(timer);
@@ -4767,20 +4805,63 @@
       timer = setTimeout(() => show(idx + 1), remaining);
     }
     function pause() {
-      if (!multi || reduce) return;
+      if (paused || slides.length < 2 || reduce) return;
+      paused = true;
       root.classList.add('is-paused');
       remaining = Math.max(300, remaining - (Date.now() - startedAt));
       clearTimeout(timer);
     }
     function resume() {
-      if (!multi || reduce) return;
+      if (!paused) return;
+      paused = false;
       root.classList.remove('is-paused');
       schedule();
     }
 
+    function render() {
+      clearTimeout(timer);
+      paused = false;
+      root.classList.remove('is-paused');
+      slides = getSlides();
+      if (!slides.length) { root.hidden = true; stage.innerHTML = ''; bars.innerHTML = ''; return; }
+      root.hidden = false;
+      root.style.setProperty('--cover-ms', BANNER_INTERVAL_MS + 'ms');
+
+      stage.innerHTML = slides.map((s, i) => {
+        const src = esc(resolveImageSrc(s.url));
+        const fit = s.fit === 'contain' ? 'fit-contain' : '';
+        const fg = `object-position:${s.posX}% ${s.posY}%; scale:${s.zoom / 100}; transform-origin:${s.posX}% ${s.posY}%;`;
+        const err = `this.onerror=null;this.src='${PLACEHOLDER}'`;
+        return `<div class="cover-slide ${fit}" role="group" aria-roledescription="slide" aria-label="${i + 1} / ${slides.length}">
+          <img class="bg" src="${src}" alt="" aria-hidden="true" onerror="${err}" />
+          <img class="fg" src="${src}" alt="${esc(s.alt)}" style="${fg}" ${i === 0 ? '' : 'loading="lazy"'} onerror="${err}" />
+        </div>`;
+      }).join('');
+
+      bars.innerHTML = slides.map((_, i) =>
+        `<button type="button" class="cover-bar" data-i="${i}" aria-label="Go to image ${i + 1}"><i></i></button>`).join('');
+      slideEls = [...stage.querySelectorAll('.cover-slide')];
+      barEls = [...bars.querySelectorAll('.cover-bar')];
+
+      const multi = slides.length > 1;
+      bars.style.display = multi ? '' : 'none';
+      document.getElementById('cover-prev').style.display = multi ? '' : 'none';
+      document.getElementById('cover-next').style.display = multi ? '' : 'none';
+      show(0);
+    }
+    window.renderCoverBanner = render;
+
+    // Controls (attached once)
     document.getElementById('cover-prev').addEventListener('click', () => show(idx - 1));
     document.getElementById('cover-next').addEventListener('click', () => show(idx + 1));
-    barEls.forEach((el) => el.addEventListener('click', () => show(Number(el.dataset.i))));
+    bars.addEventListener('click', (e) => {
+      const b = e.target.closest('.cover-bar');
+      if (b) show(Number(b.dataset.i));
+    });
+    const editBtn = document.getElementById('cover-edit');
+    if (editBtn) editBtn.addEventListener('click', () => {
+      if (typeof openImageEditorModal === 'function') openImageEditorModal('banner', null);
+    });
 
     root.addEventListener('mouseenter', pause);
     root.addEventListener('mouseleave', resume);
@@ -4794,7 +4875,8 @@
     stage.addEventListener('touchend', (e) => {
       if (tx !== null) {
         const dx = e.changedTouches[0].clientX - tx;
-        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1)); else resume();
+        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+        resume();
       }
       tx = null;
     });
@@ -4804,7 +4886,7 @@
       if (e.key === 'ArrowRight') show(idx + 1);
     });
 
-    show(0);
+    render();
   })();
 </script>
 </body>
